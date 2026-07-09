@@ -1,0 +1,100 @@
+package com.arogyamed.healthcare.service.impl;
+
+import com.arogyamed.healthcare.dto.MedicineRequestDTO;
+import com.arogyamed.healthcare.dto.MedicineResponseDTO;
+import com.arogyamed.healthcare.model.Company;
+import com.arogyamed.healthcare.model.Medicine;
+import com.arogyamed.healthcare.repository.CompanyRepository;
+import com.arogyamed.healthcare.repository.MedicineRepository;
+import com.arogyamed.healthcare.service.MedicineService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class MedicineServiceImpl implements MedicineService {
+
+    @Autowired
+    private MedicineRepository medicineRepository;
+
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Override
+    public MedicineResponseDTO createMedicine(MedicineRequestDTO request) {
+
+        Company company = companyRepository.findById(request.getCompanyId()).orElseThrow(() ->
+                        new RuntimeException("Company not found"));
+
+        Medicine medicine = new Medicine();
+
+        medicine.setCompany(company);
+        medicine.setMedicineName(request.getMedicineName());
+        medicine.setCategory(request.getCategory());
+        medicine.setDescription(request.getDescription());
+        medicine.setPrice(request.getPrice());
+        medicine.setBatchNumber(request.getBatchNumber());
+        medicine.setManufacturingDate(request.getManufacturingDate());
+        medicine.setExpiryDate(request.getExpiryDate());
+        medicine.setStockQuantity(request.getStockQuantity());
+
+        return mapToDTO(medicineRepository.save(medicine));
+    }
+
+    @Override
+    public MedicineResponseDTO getMedicineById(Long id) {
+
+        Medicine medicine = medicineRepository.findById(id).orElseThrow(() ->
+                        new RuntimeException("Medicine not found"));
+
+        return mapToDTO(medicine);
+    }
+
+    @Override
+    public MedicineResponseDTO updateMedicine(Long id, MedicineRequestDTO request) {
+
+        Medicine medicine = medicineRepository.findById(id).orElseThrow(() ->
+                        new RuntimeException("Medicine not found"));
+
+        medicine.setMedicineName(request.getMedicineName());
+        medicine.setCategory(request.getCategory());
+        medicine.setDescription(request.getDescription());
+        medicine.setPrice(request.getPrice());
+        medicine.setBatchNumber(request.getBatchNumber());
+        medicine.setManufacturingDate(request.getManufacturingDate());
+        medicine.setExpiryDate(request.getExpiryDate());
+        medicine.setStockQuantity(request.getStockQuantity());
+
+        return mapToDTO(medicineRepository.save(medicine));
+    }
+
+    @Override
+    public List<MedicineResponseDTO> getAllMedicines() {
+
+        return medicineRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private MedicineResponseDTO mapToDTO(Medicine medicine) {
+
+        MedicineResponseDTO dto = new MedicineResponseDTO();
+
+        dto.setId(medicine.getId());
+        dto.setCompanyId(medicine.getCompany().getId());
+        dto.setCompanyName(medicine.getCompany().getCompanyName());
+        dto.setMedicineName(medicine.getMedicineName());
+        dto.setCategory(medicine.getCategory());
+        dto.setDescription(medicine.getDescription());
+        dto.setPrice(medicine.getPrice());
+        dto.setBatchNumber(medicine.getBatchNumber());
+        dto.setManufacturingDate(medicine.getManufacturingDate());
+        dto.setExpiryDate(medicine.getExpiryDate());
+        dto.setStockQuantity(medicine.getStockQuantity());
+
+        return dto;
+    }
+}
