@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/kyc/**").permitAll()
                         .requestMatchers("/api/reviews/**").permitAll()
                         .requestMatchers("/api/admins/**").permitAll()
+                        .requestMatchers("/api/quality-checks/**").permitAll()
 
                         // AUTH APIs (future login/register)
                         .requestMatchers("/api/auth/**").permitAll()
