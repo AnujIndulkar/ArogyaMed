@@ -56,6 +56,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/reviews/**").permitAll()
                         .requestMatchers("/api/admins/**").permitAll()
                         .requestMatchers("/api/quality-checks/**").permitAll()
+                        .requestMatchers("/api/dashboard/**").permitAll()
+                        .requestMatchers("/api/audit-logs/**").permitAll()
 
                         // AUTH APIs (future login/register)
                         .requestMatchers("/api/auth/**").permitAll()
@@ -69,6 +71,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     // Authentication Manager (needed for login system)
     @Bean

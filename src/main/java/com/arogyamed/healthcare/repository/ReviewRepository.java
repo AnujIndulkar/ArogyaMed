@@ -2,6 +2,7 @@ package com.arogyamed.healthcare.repository;
 
 import com.arogyamed.healthcare.model.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,5 +21,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByDeliveryPartnerId(Long deliveryPartnerId);
 
     List<Review> findByMedicineId(Long medicineId);
+
+    @Query("SELECT COALESCE(AVG(r.rating),0) FROM Review r")
+    Double getAverageRating();
 
 }

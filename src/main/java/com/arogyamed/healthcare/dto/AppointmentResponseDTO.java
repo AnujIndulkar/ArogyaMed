@@ -1,5 +1,6 @@
 package com.arogyamed.healthcare.dto;
 
+import com.arogyamed.healthcare.model.AppointmentStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -27,5 +28,5 @@ public class AppointmentResponseDTO {
 
     private String reason;
 
-    private String status;
+    private AppointmentStatus status;
 }

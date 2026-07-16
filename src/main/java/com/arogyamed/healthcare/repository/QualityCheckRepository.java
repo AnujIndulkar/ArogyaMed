@@ -18,4 +18,6 @@ public interface QualityCheckRepository extends JpaRepository<QualityCheck, Long
 
     List<QualityCheck> findByBatchNumber(String batchNumber);
 
+    long countByQualityStatus(QualityStatus qualityStatus);
+
 }

@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AppointmentServiceImpl
-        implements AppointmentService {
+public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
     private AppointmentRepository appointmentRepository;

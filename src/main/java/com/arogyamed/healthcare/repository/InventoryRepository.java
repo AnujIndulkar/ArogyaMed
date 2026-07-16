@@ -4,4 +4,9 @@ import com.arogyamed.healthcare.model.Inventory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
+    long countByQuantityAvailableGreaterThan(Integer quantity);
+
+    long countByQuantityAvailableBetween(Integer min, Integer max);
+
+    long countByQuantityAvailable(Integer quantity);
 }
