@@ -28,6 +28,7 @@ public class JwtService {
 
     // 2. EXTRACT EMAIL (USED BY FILTER)
     public String extractEmail(String token) {
+
         return extractAllClaims(token).getSubject();
     }
 

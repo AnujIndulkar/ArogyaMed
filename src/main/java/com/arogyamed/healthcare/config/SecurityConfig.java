@@ -27,8 +27,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -58,6 +57,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/quality-checks/**").permitAll()
                         .requestMatchers("/api/dashboard/**").permitAll()
                         .requestMatchers("/api/audit-logs/**").permitAll()
+                        .requestMatchers("/api/barcodes/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/reports/**").permitAll()
 
                         // AUTH APIs (future login/register)
                         .requestMatchers("/api/auth/**").permitAll()

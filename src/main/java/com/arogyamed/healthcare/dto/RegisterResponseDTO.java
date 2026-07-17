@@ -1,6 +1,5 @@
 package com.arogyamed.healthcare.dto;
 
-import com.arogyamed.healthcare.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,17 +7,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponseDTO {
-
-    private String token;
+public class RegisterResponseDTO {
 
     private Long userId;
 
     private String fullName;
 
     private String email;
-
-    private Role role;
 
     private String message;
 }
