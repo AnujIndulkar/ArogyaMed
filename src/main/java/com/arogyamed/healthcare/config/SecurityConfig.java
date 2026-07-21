@@ -60,12 +60,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/barcodes/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/reports/**").permitAll()
+                        .requestMatchers("/api/documents/**").permitAll()
 
                         // AUTH APIs (future login/register)
                         .requestMatchers("/api/auth/**").permitAll()
 
                         // ALL OTHER APIs SECURED
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
 
                 // JWT Filter

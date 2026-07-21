@@ -35,18 +35,54 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
+//        if (path.startsWith("/api/auth")
+//                ||path.startsWith("/api/orders")
+//                || path.startsWith("/api/sos")
+//                || path.startsWith("/api/ambulances")
+//                || path.startsWith("/api/users")
+//                || path.startsWith("/api/patients")
+//                || path.startsWith("/api/doctors")
+//                || path.startsWith("/api/pharmacists")
+//                || path.startsWith("/api/audit-logs")
+//                || path.startsWith("/api/barcodes")
+//                || path.startsWith("/api/reports")
+//                ||path.startsWith("/api/documents")) {
+//
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+
         if (path.startsWith("/api/auth")
-                ||path.startsWith("/api/orders")
-                || path.startsWith("/api/sos")
-                || path.startsWith("/api/ambulances")
                 || path.startsWith("/api/users")
                 || path.startsWith("/api/patients")
                 || path.startsWith("/api/doctors")
                 || path.startsWith("/api/pharmacists")
+                || path.startsWith("/api/wholesalers")
+                || path.startsWith("/api/companies")
+                || path.startsWith("/api/delivery-partners")
+                || path.startsWith("/api/medicines")
+                || path.startsWith("/api/inventories")
+                || path.startsWith("/api/prescriptions")
+                || path.startsWith("/api/medical-records")
+                || path.startsWith("/api/appointments")
+                || path.startsWith("/api/sos")
+                || path.startsWith("/api/ambulances")
+                || path.startsWith("/api/orders")
+                || path.startsWith("/api/order-items")
+                || path.startsWith("/api/payments")
+                || path.startsWith("/api/delivery-tracking")
+                || path.startsWith("/api/notifications")
+                || path.startsWith("/api/kyc")
+                || path.startsWith("/api/reviews")
+                || path.startsWith("/api/admins")
+                || path.startsWith("/api/quality-checks")
+                || path.startsWith("/api/dashboard")
                 || path.startsWith("/api/audit-logs")
                 || path.startsWith("/api/barcodes")
-                || path.startsWith("/api/reports")) {
+                || path.startsWith("/api/reports")
+                || path.startsWith("/api/documents")) {
 
+            System.out.println("Bypassing JWT for: " + path);
             filterChain.doFilter(request, response);
             return;
         }
