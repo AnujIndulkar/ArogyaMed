@@ -5,6 +5,8 @@ import com.arogyamed.healthcare.dto.ReviewResponseDTO;
 import com.arogyamed.healthcare.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.arogyamed.healthcare.model.ReviewType;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -69,6 +71,36 @@ public class ReviewController {
     public String deleteReview(@PathVariable Long id) {
         reviewService.deleteReview(id);
         return "Review deleted successfully.";
+    }
+
+    // ================= Search =================
+
+    // Search by Review Type
+    @GetMapping("/search/type")
+    public List<ReviewResponseDTO> searchByReviewType(@RequestParam ReviewType reviewType) {
+
+        return reviewService.searchByReviewType(reviewType);
+    }
+
+    // Search by Rating
+    @GetMapping("/search/rating")
+    public List<ReviewResponseDTO> searchByRating(@RequestParam Integer rating) {
+
+        return reviewService.searchByRating(rating);
+    }
+
+    // Search by Minimum Rating
+    @GetMapping("/search/min-rating")
+    public List<ReviewResponseDTO> searchByMinimumRating(@RequestParam Integer rating) {
+
+        return reviewService.searchByMinimumRating(rating);
+    }
+
+    // Search by Review Date Range
+    @GetMapping("/search/date")
+    public List<ReviewResponseDTO> searchByReviewDate(@RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate) {
+
+        return reviewService.searchByReviewDate(startDate, endDate);
     }
 
 }

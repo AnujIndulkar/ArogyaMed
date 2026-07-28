@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class DeliveryTrackingServiceImpl
-        implements DeliveryTrackingService {
+public class DeliveryTrackingServiceImpl implements DeliveryTrackingService {
 
     @Autowired
     private DeliveryTrackingRepository deliveryRepository;
@@ -85,33 +84,24 @@ public class DeliveryTrackingServiceImpl
     @Override
     public DeliveryTrackingResponseDTO updateDelivery(Long id, DeliveryTrackingRequestDTO request) {
 
-        DeliveryTracking delivery = deliveryRepository
-                .findById(id)
-                .orElseThrow(() ->
+        DeliveryTracking delivery = deliveryRepository.findById(id).orElseThrow(() ->
                         new RuntimeException("Delivery record not found"));
 
-        delivery.setStatus(
-                request.getStatus());
+        delivery.setStatus(request.getStatus());
 
-        if (request.getStatus() == DeliveryStatus.OUT_FOR_DELIVERY
-                && delivery.getDispatchedAt() == null) {
+        if (request.getStatus() == DeliveryStatus.OUT_FOR_DELIVERY && delivery.getDispatchedAt() == null) {
 
-            delivery.setDispatchedAt(
-                    LocalDateTime.now());
+            delivery.setDispatchedAt(LocalDateTime.now());
         }
 
-        if (request.getStatus() == DeliveryStatus.DELIVERED
-                && delivery.getDeliveredAt() == null) {
+        if (request.getStatus() == DeliveryStatus.DELIVERED && delivery.getDeliveredAt() == null) {
 
-            delivery.setDeliveredAt(
-                    LocalDateTime.now());
+            delivery.setDeliveredAt(LocalDateTime.now());
         }
 
-        delivery.setRemarks(
-                request.getRemarks());
+        delivery.setRemarks(request.getRemarks());
 
-        DeliveryTracking updatedDelivery =
-                deliveryRepository.save(delivery);
+        DeliveryTracking updatedDelivery = deliveryRepository.save(delivery);
 
         return mapToDTO(updatedDelivery);
     }
@@ -148,5 +138,89 @@ public class DeliveryTrackingServiceImpl
         dto.setRemarks(delivery.getRemarks());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByOrderId(Long orderId) {
+
+        return mapToDTOList(deliveryRepository.findByOrderId(orderId));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByPatientName(String fullName) {
+
+        return mapToDTOList(deliveryRepository.findByOrder_Patient_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByPatientEmail(String email) {
+
+        return mapToDTOList(deliveryRepository.findByOrder_Patient_User_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByDeliveryPartnerName(String fullName) {
+
+        return mapToDTOList(deliveryRepository.findByDeliveryPartner_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByDeliveryPartnerEmail(String email) {
+
+        return mapToDTOList(deliveryRepository.findByDeliveryPartner_User_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByVehicleNumber(String vehicleNumber) {
+
+        return mapToDTOList(deliveryRepository.findByDeliveryPartner_VehicleNumberContainingIgnoreCase(vehicleNumber));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByAvailabilityStatus(String availabilityStatus) {
+
+        return mapToDTOList(deliveryRepository.findByDeliveryPartner_AvailabilityStatusContainingIgnoreCase(availabilityStatus));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByStatus(DeliveryStatus status) {
+
+        return mapToDTOList(deliveryRepository.findByStatus(status));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByAssignedDate(LocalDateTime startDate,
+                                                                  LocalDateTime endDate) {
+
+        return mapToDTOList(deliveryRepository.findByAssignedAtBetween(startDate, endDate));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByDispatchedDate(LocalDateTime startDate,
+                                                                    LocalDateTime endDate) {
+
+        return mapToDTOList(deliveryRepository.findByDispatchedAtBetween(startDate, endDate));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByDeliveredDate(LocalDateTime startDate,
+                                                                   LocalDateTime endDate) {
+
+        return mapToDTOList(deliveryRepository.findByDeliveredAtBetween(startDate, endDate));
+    }
+
+    @Override
+    public List<DeliveryTrackingResponseDTO> searchByRemarks(String remarks) {
+
+        return mapToDTOList(deliveryRepository.findByRemarksContainingIgnoreCase(remarks));
+    }
+
+    private List<DeliveryTrackingResponseDTO> mapToDTOList(List<DeliveryTracking> deliveries) {
+
+        return deliveries.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

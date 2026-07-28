@@ -2,6 +2,7 @@ package com.arogyamed.healthcare.dto;
 
 import com.arogyamed.healthcare.model.ActionStatus;
 import com.arogyamed.healthcare.model.ActionType;
+import com.arogyamed.healthcare.model.Role;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ public class AuditLogResponseDTO {
 
     private String userName;
 
-    private String role;
+    private Role role;
 
     private String moduleName;
 
@@ -43,5 +44,13 @@ public class AuditLogResponseDTO {
     private String remarks;
 
     private LocalDateTime actionTime;
+
+    private String browser;
+
+    private String operatingSystem;
+
+    private Integer responseStatus;
+
+    private Boolean success;
 
 }

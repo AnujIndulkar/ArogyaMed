@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderItemServiceImpl
-        implements OrderItemService {
+public class OrderItemServiceImpl implements OrderItemService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
@@ -113,5 +112,50 @@ public class OrderItemServiceImpl
         dto.setSubtotal(orderItem.getSubtotal());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<OrderItemResponseDTO> searchByOrderId(Long orderId) {
+
+        return mapToDTOList(orderItemRepository.findByOrderId(orderId));
+    }
+
+    @Override
+    public List<OrderItemResponseDTO> searchByMedicineName(String medicineName) {
+
+        return mapToDTOList(orderItemRepository.findByMedicineMedicineNameContainingIgnoreCase(medicineName));
+    }
+
+    @Override
+    public List<OrderItemResponseDTO> searchByGenericName(String genericName) {
+
+        return mapToDTOList(orderItemRepository.findByMedicineGenericNameContainingIgnoreCase(genericName));
+    }
+
+    @Override
+    public List<OrderItemResponseDTO> searchByQuantity(Integer quantity) {
+
+        return mapToDTOList(orderItemRepository.findByQuantity(quantity));
+    }
+
+    @Override
+    public List<OrderItemResponseDTO> searchByPrice(Double price) {
+
+        return mapToDTOList(orderItemRepository.findByPrice(price));
+    }
+
+    @Override
+    public List<OrderItemResponseDTO> searchBySubtotal(Double subtotal) {
+
+        return mapToDTOList(orderItemRepository.findBySubtotal(subtotal));
+    }
+
+    private List<OrderItemResponseDTO> mapToDTOList(List<OrderItem> orderItems) {
+
+        return orderItems.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

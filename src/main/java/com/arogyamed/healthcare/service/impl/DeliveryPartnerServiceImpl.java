@@ -10,6 +10,9 @@ import com.arogyamed.healthcare.service.DeliveryPartnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class DeliveryPartnerServiceImpl implements DeliveryPartnerService {
 
@@ -23,7 +26,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService {
     public DeliveryPartnerResponseDTO createDeliveryPartner(DeliveryPartnerRequestDTO request) {
 
         User user = userRepository.findById(request.getUserId()).orElseThrow(() ->
-                new RuntimeException("User not found"));
+                        new RuntimeException("User not found"));
 
         DeliveryPartner deliveryPartner = new DeliveryPartner();
 
@@ -80,5 +83,56 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService {
         dto.setAvailabilityStatus(deliveryPartner.getAvailabilityStatus());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<DeliveryPartnerResponseDTO> searchByFullName(String fullName) {
+
+        return mapToDTOList(deliveryPartnerRepository.findByUser_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<DeliveryPartnerResponseDTO> searchByVehicleNumber(String vehicleNumber) {
+
+        return mapToDTOList(deliveryPartnerRepository.findByVehicleNumberContainingIgnoreCase(vehicleNumber));
+    }
+
+    @Override
+    public List<DeliveryPartnerResponseDTO> searchByVehicleType(String vehicleType) {
+
+        return mapToDTOList(deliveryPartnerRepository.findByVehicleTypeContainingIgnoreCase(vehicleType));
+    }
+
+    @Override
+    public List<DeliveryPartnerResponseDTO> searchByDrivingLicenseNumber(String drivingLicenseNumber) {
+
+        return mapToDTOList(deliveryPartnerRepository.findByDrivingLicenseNumberContainingIgnoreCase(drivingLicenseNumber));
+    }
+
+    @Override
+    public List<DeliveryPartnerResponseDTO> searchByAvailabilityStatus(String availabilityStatus) {
+
+        return mapToDTOList(deliveryPartnerRepository.findByAvailabilityStatusContainingIgnoreCase(availabilityStatus));
+    }
+
+    @Override
+    public List<DeliveryPartnerResponseDTO> searchByEmail(String email) {
+
+        return mapToDTOList(deliveryPartnerRepository.findByUser_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<DeliveryPartnerResponseDTO> searchByPhoneNumber(String phoneNumber) {
+
+        return mapToDTOList(deliveryPartnerRepository.findByUser_PhoneNumberContaining(phoneNumber));
+    }
+
+    private List<DeliveryPartnerResponseDTO> mapToDTOList(List<DeliveryPartner> deliveryPartners) {
+
+        return deliveryPartners.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

@@ -30,11 +30,10 @@ public class AuditLog {
 
     private String userName;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     private String moduleName;
-
-    private String actionDescription;
 
     private String entityName;
 
@@ -47,6 +46,17 @@ public class AuditLog {
     private String httpMethod;
 
     private String userAgent;
+
+    private String browser;
+
+    private String operatingSystem;
+
+    private Integer responseStatus;
+
+    private Boolean success;
+
+    @Column(length = 2000)
+    private String actionDescription;
 
     @Column(length = 1000)
     private String remarks;

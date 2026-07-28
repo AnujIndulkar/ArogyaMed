@@ -10,6 +10,9 @@ import com.arogyamed.healthcare.service.PharmacistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PharmacistServiceImpl implements PharmacistService {
 
@@ -75,5 +78,56 @@ public class PharmacistServiceImpl implements PharmacistService {
         dto.setPharmacyAddress(pharmacist.getPharmacyAddress());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<PharmacistResponseDTO> searchByFullName(String fullName) {
+
+        return mapToDTOList(pharmacistRepository.findByUser_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<PharmacistResponseDTO> searchByPharmacyName(String pharmacyName) {
+
+        return mapToDTOList(pharmacistRepository.findByPharmacyNameContainingIgnoreCase(pharmacyName));
+    }
+
+    @Override
+    public List<PharmacistResponseDTO> searchByLicenseNumber(String licenseNumber) {
+
+        return mapToDTOList(pharmacistRepository.findByLicenseNumberContainingIgnoreCase(licenseNumber));
+    }
+
+    @Override
+    public List<PharmacistResponseDTO> searchByExperienceYears(Integer experienceYears) {
+
+        return mapToDTOList(pharmacistRepository.findByExperienceYearsGreaterThanEqual(experienceYears));
+    }
+
+    @Override
+    public List<PharmacistResponseDTO> searchByPharmacyAddress(String pharmacyAddress) {
+
+        return mapToDTOList(pharmacistRepository.findByPharmacyAddressContainingIgnoreCase(pharmacyAddress));
+    }
+
+    @Override
+    public List<PharmacistResponseDTO> searchByEmail(String email) {
+
+        return mapToDTOList(pharmacistRepository.findByUser_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<PharmacistResponseDTO> searchByPhoneNumber(String phoneNumber) {
+
+        return mapToDTOList(pharmacistRepository.findByUser_PhoneNumberContaining(phoneNumber));
+    }
+
+    private List<PharmacistResponseDTO> mapToDTOList(List<Pharmacist> pharmacists) {
+
+        return pharmacists.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

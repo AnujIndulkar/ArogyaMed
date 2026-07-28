@@ -5,6 +5,11 @@ import com.arogyamed.healthcare.dto.AdminRequestDTO;
 import com.arogyamed.healthcare.dto.AdminResponseDTO;
 import com.arogyamed.healthcare.service.AdminService;
 import org.springframework.web.bind.annotation.*;
+import com.arogyamed.healthcare.model.AdminDepartment;
+import com.arogyamed.healthcare.model.AdminStatus;
+import com.arogyamed.healthcare.model.AdminType;
+
+import java.time.LocalDate;
 
 import java.util.List;
 
@@ -38,9 +43,7 @@ public class AdminController {
 
     // Update Admin
     @PutMapping("/{id}")
-    public AdminResponseDTO updateAdmin(
-            @PathVariable Long id,
-            @RequestBody AdminRequestDTO requestDTO) {
+    public AdminResponseDTO updateAdmin(@PathVariable Long id, @RequestBody AdminRequestDTO requestDTO) {
 
         return adminService.updateAdmin(id, requestDTO);
     }
@@ -75,4 +78,71 @@ public class AdminController {
         return adminService.getDashboard();
     }
 
+    // ==========================
+    // Advanced Search & Filtering
+    // ==========================
+
+    // Search by Employee ID
+    @GetMapping("/search/employee-id")
+    public AdminResponseDTO searchByEmployeeId(@RequestParam String employeeId) {
+
+        return adminService.searchByEmployeeId(employeeId);
+    }
+
+    // Search by Department
+    @GetMapping("/search/department")
+    public List<AdminResponseDTO> searchByDepartment(
+            @RequestParam AdminDepartment department) {
+
+        return adminService.searchByDepartment(department);
+    }
+
+    // Search by Status
+    @GetMapping("/search/status")
+    public List<AdminResponseDTO> searchByStatus(@RequestParam AdminStatus status) {
+
+        return adminService.searchByStatus(status);
+    }
+
+    // Search by Admin Type
+    @GetMapping("/search/type")
+    public List<AdminResponseDTO> searchByAdminType(@RequestParam AdminType adminType) {
+
+        return adminService.searchByAdminType(adminType);
+    }
+
+    // Search by Designation
+    @GetMapping("/search/designation")
+    public List<AdminResponseDTO> searchByDesignation(@RequestParam String designation) {
+
+        return adminService.searchByDesignation(designation);
+    }
+
+    // Search by Office Location
+    @GetMapping("/search/location")
+    public List<AdminResponseDTO> searchByOfficeLocation(@RequestParam String officeLocation) {
+
+        return adminService.searchByOfficeLocation(officeLocation);
+    }
+
+    // Search by Joining Date
+    @GetMapping("/search/joining-date")
+    public List<AdminResponseDTO> searchByJoiningDate(@RequestParam LocalDate joiningDate) {
+
+        return adminService.searchByJoiningDate(joiningDate);
+    }
+
+    // Search by Department and Status
+    @GetMapping("/search/department-status")
+    public List<AdminResponseDTO> searchByDepartmentAndStatus(@RequestParam AdminDepartment department, @RequestParam AdminStatus status) {
+
+        return adminService.searchByDepartmentAndStatus(department, status);
+    }
+
+    // Search by Admin Type and Status
+    @GetMapping("/search/type-status")
+    public List<AdminResponseDTO> searchByAdminTypeAndStatus(@RequestParam AdminType adminType, @RequestParam AdminStatus status) {
+
+        return adminService.searchByAdminTypeAndStatus(adminType, status);
+    }
 }

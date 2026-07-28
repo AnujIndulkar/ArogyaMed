@@ -13,6 +13,9 @@ import com.arogyamed.healthcare.repository.QualityCheckRepository;
 import com.arogyamed.healthcare.service.QualityCheckService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.arogyamed.healthcare.model.QualityStatus;
+
+import java.time.LocalDate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,13 +51,15 @@ public class QualityCheckServiceImpl implements QualityCheckService {
                 .temperatureVerified(requestDTO.isTemperatureVerified())
                 .expiryVerified(requestDTO.isExpiryVerified())
                 .inspectorRemarks(requestDTO.getInspectorRemarks())
-                .inspectionDate(requestDTO.getInspectionDate())
-                .qualityStatus(requestDTO.getQualityStatus())
+                .inspectionDate(requestDTO.getInspectionDate() == null
+                                ? LocalDate.now()
+                                : requestDTO.getInspectionDate())
+                .qualityStatus(requestDTO.getQualityStatus()).qualityStatus(requestDTO.getQualityStatus() == null
+                                ? QualityStatus.PENDING
+                                : requestDTO.getQualityStatus())
                 .build();
 
-        return mapToResponseDTO(
-                qualityCheckRepository.save(qualityCheck)
-        );
+        return mapToResponseDTO(qualityCheckRepository.save(qualityCheck));
     }
 
     @Override
@@ -133,6 +138,91 @@ public class QualityCheckServiceImpl implements QualityCheckService {
                 .inspectionDate(qualityCheck.getInspectionDate())
                 .qualityStatus(qualityCheck.getQualityStatus())
                 .build();
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByMedicine(Long medicineId) {
+
+        Medicine medicine = medicineRepository.findById(medicineId)
+                .orElseThrow(() -> new RuntimeException("Medicine not found"));
+
+        return mapToResponseDTOList(qualityCheckRepository.findByMedicine(medicine));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByCompany(Long companyId) {
+
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+
+        return mapToResponseDTOList(qualityCheckRepository.findByCompany(company));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByInspector(Long adminId) {
+
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        return mapToResponseDTOList(qualityCheckRepository.findByInspector(admin));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByQualityStatus(QualityStatus qualityStatus) {
+
+        return mapToResponseDTOList(qualityCheckRepository.findByQualityStatus(qualityStatus));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByBatchNumber(String batchNumber) {
+
+        return mapToResponseDTOList(qualityCheckRepository.findByBatchNumber(batchNumber));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByInspectionDate(LocalDate inspectionDate) {
+
+        return mapToResponseDTOList(qualityCheckRepository.findByInspectionDate(inspectionDate));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByInspectionDate(LocalDate startDate, LocalDate endDate) {
+
+        return mapToResponseDTOList(qualityCheckRepository.findByInspectionDateBetween(startDate, endDate));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByPackagingVerified(boolean packagingVerified) {
+
+        return mapToResponseDTOList(qualityCheckRepository.findByPackagingVerified(packagingVerified));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchBySealVerified(boolean sealVerified) {
+
+        return mapToResponseDTOList(qualityCheckRepository.findBySealVerified(sealVerified));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByTemperatureVerified(boolean temperatureVerified) {
+
+        return mapToResponseDTOList(qualityCheckRepository.findByTemperatureVerified(temperatureVerified));
+    }
+
+    @Override
+    public List<QualityCheckResponseDTO> searchByExpiryVerified(boolean expiryVerified) {
+
+        return mapToResponseDTOList(qualityCheckRepository.findByExpiryVerified(expiryVerified));
+    }
+
+    private List<QualityCheckResponseDTO> mapToResponseDTOList(
+            List<QualityCheck> qualityChecks) {
+
+        return qualityChecks.stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
 
 }

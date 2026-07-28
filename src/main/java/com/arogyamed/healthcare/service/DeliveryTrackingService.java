@@ -2,6 +2,9 @@ package com.arogyamed.healthcare.service;
 
 import com.arogyamed.healthcare.dto.DeliveryTrackingRequestDTO;
 import com.arogyamed.healthcare.dto.DeliveryTrackingResponseDTO;
+import com.arogyamed.healthcare.model.DeliveryStatus;
+
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -14,5 +17,31 @@ public interface DeliveryTrackingService {
     DeliveryTrackingResponseDTO updateDelivery(Long id, DeliveryTrackingRequestDTO request);
 
     List<DeliveryTrackingResponseDTO> getAllDeliveries();
+
+    // ================= Search =================
+
+    List<DeliveryTrackingResponseDTO> searchByOrderId(Long orderId);
+
+    List<DeliveryTrackingResponseDTO> searchByPatientName(String fullName);
+
+    List<DeliveryTrackingResponseDTO> searchByPatientEmail(String email);
+
+    List<DeliveryTrackingResponseDTO> searchByDeliveryPartnerName(String fullName);
+
+    List<DeliveryTrackingResponseDTO> searchByDeliveryPartnerEmail(String email);
+
+    List<DeliveryTrackingResponseDTO> searchByVehicleNumber(String vehicleNumber);
+
+    List<DeliveryTrackingResponseDTO> searchByAvailabilityStatus(String availabilityStatus);
+
+    List<DeliveryTrackingResponseDTO> searchByStatus(DeliveryStatus status);
+
+    List<DeliveryTrackingResponseDTO> searchByAssignedDate(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<DeliveryTrackingResponseDTO> searchByDispatchedDate(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<DeliveryTrackingResponseDTO> searchByDeliveredDate(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<DeliveryTrackingResponseDTO> searchByRemarks(String remarks);
 
 }

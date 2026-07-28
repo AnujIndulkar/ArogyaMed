@@ -8,6 +8,8 @@ import com.arogyamed.healthcare.model.*;
 import com.arogyamed.healthcare.repository.*;
 import com.arogyamed.healthcare.service.AdminService;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -223,4 +225,95 @@ public class AdminServiceImpl implements AdminService {
 
         return dashboard;
     }
+
+    // ==========================
+    // Advanced Search & Filtering
+    // ==========================
+
+    @Override
+    public List<AdminResponseDTO> searchByDepartment(AdminDepartment department) {
+
+        return adminRepository.findByDepartment(department)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AdminResponseDTO> searchByStatus(AdminStatus status) {
+
+        return adminRepository.findByStatus(status)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AdminResponseDTO> searchByAdminType(AdminType adminType) {
+
+        return adminRepository.findByAdminType(adminType)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public AdminResponseDTO searchByEmployeeId(String employeeId) {
+
+        Admin admin = adminRepository.findByEmployeeId(employeeId).orElseThrow(() ->
+                        new ResourceNotFoundException("Admin not found with Employee ID : " + employeeId));
+
+        return mapToResponse(admin);
+    }
+
+    @Override
+    public List<AdminResponseDTO> searchByDesignation(String designation) {
+
+        return adminRepository.findAll()
+                .stream()
+                .filter(admin -> admin.getDesignation() != null && admin.getDesignation().equalsIgnoreCase(designation))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AdminResponseDTO> searchByOfficeLocation(String officeLocation) {
+
+        return adminRepository.findAll()
+                .stream()
+                .filter(admin -> admin.getOfficeLocation() != null && admin.getOfficeLocation().equalsIgnoreCase(officeLocation))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AdminResponseDTO> searchByJoiningDate(LocalDate joiningDate) {
+
+        return adminRepository.findAll()
+                .stream()
+                .filter(admin -> admin.getJoiningDate() != null && admin.getJoiningDate().equals(joiningDate))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AdminResponseDTO> searchByDepartmentAndStatus(AdminDepartment department, AdminStatus status) {
+
+        return adminRepository.findByDepartment(department)
+                .stream()
+                .filter(admin -> admin.getStatus() == status)
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AdminResponseDTO> searchByAdminTypeAndStatus(AdminType adminType, AdminStatus status) {
+
+        return adminRepository.findByAdminType(adminType)
+                .stream()
+                .filter(admin -> admin.getStatus() == status)
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
 }

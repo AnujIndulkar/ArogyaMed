@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class KYCServiceImpl
-        implements KYCService {
+public class KYCServiceImpl implements KYCService {
 
     @Autowired
     private KYCRepository kycRepository;
@@ -164,5 +163,50 @@ public class KYCServiceImpl
         dto.setVerifiedAt(kyc.getVerifiedAt());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<KYCResponseDTO> searchByFullName(String fullName) {
+
+        return mapToDTOList(kycRepository.findByUser_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<KYCResponseDTO> searchByEmail(String email) {
+
+        return mapToDTOList(kycRepository.findByUser_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<KYCResponseDTO> searchByDocumentType(String documentType) {
+
+        return mapToDTOList(kycRepository.findByDocumentTypeContainingIgnoreCase(documentType));
+    }
+
+    @Override
+    public List<KYCResponseDTO> searchByDocumentNumber(String documentNumber) {
+
+        return mapToDTOList(kycRepository.findByDocumentNumberContainingIgnoreCase(documentNumber));
+    }
+
+    @Override
+    public List<KYCResponseDTO> searchByStatus(KYCStatus status) {
+
+        return mapToDTOList(kycRepository.findByStatus(status));
+    }
+
+    @Override
+    public List<KYCResponseDTO> searchByRemarks(String remarks) {
+
+        return mapToDTOList(kycRepository.findByRemarksContainingIgnoreCase(remarks));
+    }
+
+    private List<KYCResponseDTO> mapToDTOList(List<KYC> kycList) {
+
+        return kycList.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

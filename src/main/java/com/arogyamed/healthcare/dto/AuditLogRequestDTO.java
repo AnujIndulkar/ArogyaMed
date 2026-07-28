@@ -2,6 +2,7 @@ package com.arogyamed.healthcare.dto;
 
 import com.arogyamed.healthcare.model.ActionStatus;
 import com.arogyamed.healthcare.model.ActionType;
+import com.arogyamed.healthcare.model.Role;
 import lombok.*;
 
 @Getter
@@ -14,7 +15,7 @@ public class AuditLogRequestDTO {
 
     private String userName;
 
-    private String role;
+    private Role role;
 
     private String moduleName;
 
@@ -37,5 +38,13 @@ public class AuditLogRequestDTO {
     private String userAgent;
 
     private String remarks;
+
+    private String browser;
+
+    private String operatingSystem;
+
+    private Integer responseStatus;
+
+    private Boolean success;
 
 }

@@ -10,6 +10,7 @@ import com.arogyamed.healthcare.service.MedicineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -96,5 +97,53 @@ public class MedicineServiceImpl implements MedicineService {
         dto.setStockQuantity(medicine.getStockQuantity());
 
         return dto;
+    }
+
+    @Override
+    public List<MedicineResponseDTO> searchByMedicineName(String medicineName) {
+
+        return mapToDTOList(medicineRepository.findByMedicineNameContainingIgnoreCase(medicineName));
+    }
+
+    @Override
+    public List<MedicineResponseDTO> searchByCategory(String category) {
+
+        return mapToDTOList(medicineRepository.findByCategoryContainingIgnoreCase(category));
+    }
+
+    @Override
+    public List<MedicineResponseDTO> searchByCompany(String companyName) {
+
+        return mapToDTOList(medicineRepository.findByCompany_CompanyNameContainingIgnoreCase(companyName));
+    }
+
+    @Override
+    public List<MedicineResponseDTO> searchByBatchNumber(String batchNumber) {
+
+        return mapToDTOList(medicineRepository.findByBatchNumberContainingIgnoreCase(batchNumber));
+    }
+
+    @Override
+    public List<MedicineResponseDTO> searchByPriceRange(Double minPrice, Double maxPrice) {
+
+        return mapToDTOList(medicineRepository.findByPriceBetween(minPrice, maxPrice));
+    }
+
+    @Override
+    public List<MedicineResponseDTO> searchByExpiryDate(LocalDate expiryDate) {
+
+        return mapToDTOList(medicineRepository.findByExpiryDateBefore(expiryDate));
+    }
+
+    @Override
+    public List<MedicineResponseDTO> searchLowStockMedicines(Integer stockQuantity) {
+
+        return mapToDTOList(medicineRepository.findByStockQuantityLessThanEqual(stockQuantity));
+    }
+
+    private List<MedicineResponseDTO> mapToDTOList(List<Medicine> medicines) {
+        return medicines.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

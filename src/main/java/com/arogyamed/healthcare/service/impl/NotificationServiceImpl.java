@@ -9,14 +9,14 @@ import com.arogyamed.healthcare.repository.UserRepository;
 import com.arogyamed.healthcare.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.arogyamed.healthcare.model.NotificationType;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class NotificationServiceImpl
-        implements NotificationService {
+public class NotificationServiceImpl implements NotificationService {
 
     @Autowired
     private NotificationRepository notificationRepository;
@@ -115,5 +115,44 @@ public class NotificationServiceImpl
         dto.setCreatedAt(notification.getCreatedAt());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<NotificationResponseDTO> searchByUserId(Long userId) {
+
+        return mapToDTOList(notificationRepository.findByUserId(userId));
+    }
+
+    @Override
+    public List<NotificationResponseDTO> searchByUserEmail(String email) {
+
+        return mapToDTOList(notificationRepository.findByUser_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<NotificationResponseDTO> searchByType(NotificationType type) {
+
+        return mapToDTOList(notificationRepository.findByType(type));
+    }
+
+    @Override
+    public List<NotificationResponseDTO> searchByReadStatus(Boolean isRead) {
+
+        return mapToDTOList(notificationRepository.findByIsRead(isRead));
+    }
+
+    @Override
+    public List<NotificationResponseDTO> searchByCreatedDate(LocalDateTime startDate, LocalDateTime endDate) {
+
+        return mapToDTOList(notificationRepository.findByCreatedAtBetween(startDate, endDate));
+    }
+
+    private List<NotificationResponseDTO> mapToDTOList(List<Notification> notifications) {
+
+        return notifications.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

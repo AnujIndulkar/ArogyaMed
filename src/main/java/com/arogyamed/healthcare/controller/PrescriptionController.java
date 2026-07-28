@@ -34,4 +34,55 @@ public class PrescriptionController {
     public List<PrescriptionResponseDTO> getAllPrescriptions() {
         return prescriptionService.getAllPrescriptions();
     }
+
+    // ================= Search =================
+
+    // Search by Patient Name
+    @GetMapping("/search/patient")
+    public List<PrescriptionResponseDTO> searchByPatientName(@RequestParam String fullName) {
+
+        return prescriptionService.searchByPatientName(fullName);
+    }
+
+    // Search by Doctor Name
+    @GetMapping("/search/doctor")
+    public List<PrescriptionResponseDTO> searchByDoctorName(@RequestParam String fullName) {
+
+        return prescriptionService.searchByDoctorName(fullName);
+    }
+
+    // Search by Diagnosis
+    @GetMapping("/search/diagnosis")
+    public List<PrescriptionResponseDTO> searchByDiagnosis(@RequestParam String diagnosis) {
+
+        return prescriptionService.searchByDiagnosis(diagnosis);
+    }
+
+    // Search by Medicine
+    @GetMapping("/search/medicine")
+    public List<PrescriptionResponseDTO> searchByMedicine(@RequestParam String medicine) {
+
+        return prescriptionService.searchByMedicine(medicine);
+    }
+
+    // Search by Prescription Date
+    @GetMapping("/search/date")
+    public List<PrescriptionResponseDTO> searchByPrescriptionDate(@RequestParam java.time.LocalDate prescriptionDate) {
+
+        return prescriptionService.searchByPrescriptionDate(prescriptionDate);
+    }
+
+    // Search by Date Range
+    @GetMapping("/search/date-range")
+    public List<PrescriptionResponseDTO> searchByPrescriptionDateRange(@RequestParam java.time.LocalDate startDate, @RequestParam java.time.LocalDate endDate) {
+
+        return prescriptionService.searchByPrescriptionDateRange(startDate, endDate);
+    }
+
+    // Search by Notes
+    @GetMapping("/search/notes")
+    public List<PrescriptionResponseDTO> searchByNotes(@RequestParam String notes) {
+
+        return prescriptionService.searchByNotes(notes);
+    }
 }

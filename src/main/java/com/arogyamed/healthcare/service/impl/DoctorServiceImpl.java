@@ -10,6 +10,9 @@ import com.arogyamed.healthcare.service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class DoctorServiceImpl implements DoctorService {
 
@@ -80,5 +83,56 @@ public class DoctorServiceImpl implements DoctorService {
         dto.setConsultationFee(doctor.getConsultationFee());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<DoctorResponseDTO> searchByDoctorName(String fullName) {
+
+        return mapToDTOList(doctorRepository.findByUser_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<DoctorResponseDTO> searchBySpecialization(String specialization) {
+
+        return mapToDTOList(doctorRepository.findBySpecializationContainingIgnoreCase(specialization));
+    }
+
+    @Override
+    public List<DoctorResponseDTO> searchByQualification(String qualification) {
+
+        return mapToDTOList(doctorRepository.findByQualificationContainingIgnoreCase(qualification));
+    }
+
+    @Override
+    public List<DoctorResponseDTO> searchByExperience(Integer experienceYears) {
+
+        return mapToDTOList(doctorRepository.findByExperienceYearsGreaterThanEqual(experienceYears));
+    }
+
+    @Override
+    public List<DoctorResponseDTO> searchByHospital(String hospitalName) {
+
+        return mapToDTOList(doctorRepository.findByHospitalNameContainingIgnoreCase(hospitalName));
+    }
+
+    @Override
+    public List<DoctorResponseDTO> searchByConsultationFee(Double minFee, Double maxFee) {
+
+        return mapToDTOList(doctorRepository.findByConsultationFeeBetween(minFee, maxFee));
+    }
+
+    @Override
+    public List<DoctorResponseDTO> searchByLicenseNumber(String licenseNumber) {
+
+        return mapToDTOList(doctorRepository.findByLicenseNumberContainingIgnoreCase(licenseNumber));
+    }
+
+    private List<DoctorResponseDTO> mapToDTOList(List<Doctor> doctors) {
+
+        return doctors.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

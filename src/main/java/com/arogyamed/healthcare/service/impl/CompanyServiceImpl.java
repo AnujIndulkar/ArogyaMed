@@ -10,6 +10,9 @@ import com.arogyamed.healthcare.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
@@ -77,5 +80,56 @@ public class CompanyServiceImpl implements CompanyService {
         dto.setContactPerson(company.getContactPerson());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<CompanyResponseDTO> searchByCompanyName(String companyName) {
+
+        return mapToDTOList(companyRepository.findByCompanyNameContainingIgnoreCase(companyName));
+    }
+
+    @Override
+    public List<CompanyResponseDTO> searchByLicenseNumber(String licenseNumber) {
+
+        return mapToDTOList(companyRepository.findByLicenseNumberContainingIgnoreCase(licenseNumber));
+    }
+
+    @Override
+    public List<CompanyResponseDTO> searchByGstNumber(String gstNumber) {
+
+        return mapToDTOList(companyRepository.findByGstNumberContainingIgnoreCase(gstNumber));
+    }
+
+    @Override
+    public List<CompanyResponseDTO> searchByContactPerson(String contactPerson) {
+
+        return mapToDTOList(companyRepository.findByContactPersonContainingIgnoreCase(contactPerson));
+    }
+
+    @Override
+    public List<CompanyResponseDTO> searchByCompanyAddress(String companyAddress) {
+
+        return mapToDTOList(companyRepository.findByCompanyAddressContainingIgnoreCase(companyAddress));
+    }
+
+    @Override
+    public List<CompanyResponseDTO> searchByEmail(String email) {
+
+        return mapToDTOList(companyRepository.findByUser_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<CompanyResponseDTO> searchByPhoneNumber(String phoneNumber) {
+
+        return mapToDTOList(companyRepository.findByUser_PhoneNumberContaining(phoneNumber));
+    }
+
+    private List<CompanyResponseDTO> mapToDTOList(List<Company> companies) {
+
+        return companies.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

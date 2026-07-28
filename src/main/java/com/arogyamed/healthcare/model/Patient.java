@@ -31,9 +31,37 @@ public class Patient {
 
     private Double weight;
 
-    private String allergies;
-
+    @Column(length = 1000)
     private String medicalHistory;
 
+    @Column(length = 1000)
+    private String allergies;
+
     private LocalDate dateOfBirth;
+
+    private String emergencyContactName;
+
+    @Column(length = 20)
+    private String emergencyContactNumber;
+
+    private String occupation;
+
+    private String maritalStatus;
+
+    private String profileImage;
+
+    private String insuranceProvider;
+
+    @Column(unique = true)
+    private String insurancePolicyNumber;
+
+    private String city;
+
+    private String district;
+
+    private String state;
+
+    private String country;
+
+    private String pincode;
 }

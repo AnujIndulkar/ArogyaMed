@@ -2,6 +2,9 @@ package com.arogyamed.healthcare.service;
 
 import com.arogyamed.healthcare.dto.NotificationRequestDTO;
 import com.arogyamed.healthcare.dto.NotificationResponseDTO;
+import com.arogyamed.healthcare.model.NotificationType;
+
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -16,5 +19,22 @@ public interface NotificationService {
     List<NotificationResponseDTO> getNotificationsByUser(Long userId);
 
     NotificationResponseDTO markAsRead(Long id);
+
+    // ================= Search =================
+
+    // Search by User ID
+    List<NotificationResponseDTO> searchByUserId(Long userId);
+
+    // Search by User Email
+    List<NotificationResponseDTO> searchByUserEmail(String email);
+
+    // Search by Notification Type
+    List<NotificationResponseDTO> searchByType(NotificationType type);
+
+    // Search by Read Status
+    List<NotificationResponseDTO> searchByReadStatus(Boolean isRead);
+
+    // Search by Created Date Range
+    List<NotificationResponseDTO> searchByCreatedDate(LocalDateTime startDate, LocalDateTime endDate);
 
 }

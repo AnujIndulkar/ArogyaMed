@@ -90,4 +90,55 @@ public class InventoryServiceImpl implements InventoryService {
 
         return dto;
     }
+
+    // ================= Search =================
+
+    @Override
+    public List<InventoryResponseDTO> searchByMedicineName(String medicineName) {
+
+        return mapToDTOList(inventoryRepository.findByMedicine_MedicineNameContainingIgnoreCase(medicineName));
+    }
+
+    @Override
+    public List<InventoryResponseDTO> searchByCompanyName(String companyName) {
+
+        return mapToDTOList(inventoryRepository.findByMedicine_Company_CompanyNameContainingIgnoreCase(companyName));
+    }
+
+    @Override
+    public List<InventoryResponseDTO> searchByCategory(String category) {
+
+        return mapToDTOList(inventoryRepository.findByMedicine_CategoryContainingIgnoreCase(category));
+    }
+
+    @Override
+    public List<InventoryResponseDTO> searchByBatchNumber(String batchNumber) {
+
+        return mapToDTOList(inventoryRepository.findByMedicine_BatchNumberContainingIgnoreCase(batchNumber));
+    }
+
+    @Override
+    public List<InventoryResponseDTO> searchByQuantity(Integer quantity) {
+
+        return mapToDTOList(inventoryRepository.findByQuantityAvailableGreaterThanEqual(quantity));
+    }
+
+    @Override
+    public List<InventoryResponseDTO> searchLowStock(Integer quantity) {
+
+        return mapToDTOList(inventoryRepository.findByQuantityAvailableLessThanEqual(quantity));
+    }
+
+    @Override
+    public List<InventoryResponseDTO> searchByLastUpdated(LocalDateTime lastUpdated) {
+
+        return mapToDTOList(inventoryRepository.findByLastUpdatedAfter(lastUpdated));
+    }
+
+    private List<InventoryResponseDTO> mapToDTOList(List<Inventory> inventories) {
+
+        return inventories.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 }

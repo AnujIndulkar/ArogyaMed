@@ -11,6 +11,8 @@ import com.arogyamed.healthcare.repository.PatientRepository;
 import com.arogyamed.healthcare.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.arogyamed.healthcare.model.AppointmentStatus;
+import java.time.LocalDate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,5 +108,51 @@ public class AppointmentServiceImpl implements AppointmentService {
         dto.setStatus(appointment.getStatus());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<AppointmentResponseDTO> searchByPatientName(String fullName) {
+
+        return mapToDTOList(appointmentRepository.findByPatient_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<AppointmentResponseDTO> searchByDoctorName(String fullName) {
+
+        return mapToDTOList(appointmentRepository.findByDoctor_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<AppointmentResponseDTO> searchByStatus(AppointmentStatus status) {
+
+        return mapToDTOList(appointmentRepository.findByStatus(status));
+    }
+
+    @Override
+    public List<AppointmentResponseDTO> searchByAppointmentDate(LocalDate appointmentDate) {
+
+        return mapToDTOList(appointmentRepository.findByAppointmentDate(appointmentDate));
+    }
+
+    @Override
+    public List<AppointmentResponseDTO> searchByAppointmentDateRange(LocalDate startDate,
+                                                                     LocalDate endDate) {
+
+        return mapToDTOList(appointmentRepository.findByAppointmentDateBetween(startDate, endDate));
+    }
+
+    @Override
+    public List<AppointmentResponseDTO> searchByReason(String reason) {
+
+        return mapToDTOList(appointmentRepository.findByReasonContainingIgnoreCase(reason));
+    }
+
+    private List<AppointmentResponseDTO> mapToDTOList(List<Appointment> appointments) {
+
+        return appointments.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

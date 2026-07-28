@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.time.LocalDate;
+
 @Service
 public class PrescriptionServiceImpl implements PrescriptionService {
 
@@ -108,5 +110,57 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         dto.setNotes(prescription.getNotes());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<PrescriptionResponseDTO> searchByPatientName(String fullName) {
+
+        return mapToDTOList(prescriptionRepository.findByPatient_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<PrescriptionResponseDTO> searchByDoctorName(String fullName) {
+
+        return mapToDTOList(prescriptionRepository.findByDoctor_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<PrescriptionResponseDTO> searchByDiagnosis(String diagnosis) {
+
+        return mapToDTOList(prescriptionRepository.findByDiagnosisContainingIgnoreCase(diagnosis));
+    }
+
+    @Override
+    public List<PrescriptionResponseDTO> searchByMedicine(String medicine) {
+
+        return mapToDTOList(prescriptionRepository.findByMedicinesContainingIgnoreCase(medicine));
+    }
+
+    @Override
+    public List<PrescriptionResponseDTO> searchByPrescriptionDate(LocalDate prescriptionDate) {
+
+        return mapToDTOList(prescriptionRepository.findByPrescriptionDate(prescriptionDate));
+    }
+
+    @Override
+    public List<PrescriptionResponseDTO> searchByPrescriptionDateRange(LocalDate startDate,
+                                                                       LocalDate endDate) {
+
+        return mapToDTOList(prescriptionRepository.findByPrescriptionDateBetween(startDate, endDate));
+    }
+
+    @Override
+    public List<PrescriptionResponseDTO> searchByNotes(String notes) {
+
+        return mapToDTOList(prescriptionRepository.findByNotesContainingIgnoreCase(notes));
+    }
+
+    private List<PrescriptionResponseDTO> mapToDTOList(List<Prescription> prescriptions) {
+
+        return prescriptions.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

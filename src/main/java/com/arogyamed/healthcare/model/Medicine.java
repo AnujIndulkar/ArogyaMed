@@ -21,6 +21,8 @@ public class Medicine {
 
     private String category;
 
+    private String genericName;
+
     private String description;
 
     private Double price;

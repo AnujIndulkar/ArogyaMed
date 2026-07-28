@@ -10,6 +10,9 @@ import com.arogyamed.healthcare.service.WholesalerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class WholesalerServiceImpl implements WholesalerService {
 
@@ -77,5 +80,56 @@ public class WholesalerServiceImpl implements WholesalerService {
         dto.setContactPerson(wholesaler.getContactPerson());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<WholesalerResponseDTO> searchByCompanyName(String companyName) {
+
+        return mapToDTOList(wholesalerRepository.findByCompanyNameContainingIgnoreCase(companyName));
+    }
+
+    @Override
+    public List<WholesalerResponseDTO> searchByLicenseNumber(String licenseNumber) {
+
+        return mapToDTOList(wholesalerRepository.findByLicenseNumberContainingIgnoreCase(licenseNumber));
+    }
+
+    @Override
+    public List<WholesalerResponseDTO> searchByGstNumber(String gstNumber) {
+
+        return mapToDTOList(wholesalerRepository.findByGstNumberContainingIgnoreCase(gstNumber));
+    }
+
+    @Override
+    public List<WholesalerResponseDTO> searchByWarehouseAddress(String warehouseAddress) {
+
+        return mapToDTOList(wholesalerRepository.findByWarehouseAddressContainingIgnoreCase(warehouseAddress));
+    }
+
+    @Override
+    public List<WholesalerResponseDTO> searchByContactPerson(String contactPerson) {
+
+        return mapToDTOList(wholesalerRepository.findByContactPersonContainingIgnoreCase(contactPerson));
+    }
+
+    @Override
+    public List<WholesalerResponseDTO> searchByEmail(String email) {
+
+        return mapToDTOList(wholesalerRepository.findByUser_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<WholesalerResponseDTO> searchByPhoneNumber(String phoneNumber) {
+
+        return mapToDTOList(wholesalerRepository.findByUser_PhoneNumberContaining(phoneNumber));
+    }
+
+    private List<WholesalerResponseDTO> mapToDTOList(List<Wholesaler> wholesalers) {
+
+        return wholesalers.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

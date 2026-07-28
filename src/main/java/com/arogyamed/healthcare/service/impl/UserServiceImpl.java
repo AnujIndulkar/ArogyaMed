@@ -2,9 +2,11 @@ package com.arogyamed.healthcare.service.impl;
 
 import com.arogyamed.healthcare.dto.UserRequestDTO;
 import com.arogyamed.healthcare.dto.UserResponseDTO;
+import com.arogyamed.healthcare.model.Role;
 import com.arogyamed.healthcare.model.User;
 import com.arogyamed.healthcare.repository.UserRepository;
 import com.arogyamed.healthcare.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +67,53 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User not found");
         }
         userRepository.deleteById(id);
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<UserResponseDTO> searchByFullName(String fullName) {
+
+        return userRepository.findByFullNameContainingIgnoreCase(fullName)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserResponseDTO> searchByEmail(String email) {
+
+        return userRepository.findByEmailContainingIgnoreCase(email)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserResponseDTO> searchByPhoneNumber(String phoneNumber) {
+
+        return userRepository.findByPhoneNumberContaining(phoneNumber)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserResponseDTO> searchByRole(Role role) {
+
+        return userRepository.findByRole(role)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserResponseDTO> searchByVerified(boolean verified) {
+
+        return userRepository.findByVerified(verified)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     // MAPPER METHOD

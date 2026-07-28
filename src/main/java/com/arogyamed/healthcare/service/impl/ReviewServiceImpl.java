@@ -161,7 +161,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void deleteReview(Long id) {
 
-        reviewRepository.deleteById(id);
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
+
+        reviewRepository.delete(review);
     }
 
     private ReviewResponseDTO mapToDTO(Review review) {
@@ -177,6 +180,39 @@ public class ReviewServiceImpl implements ReviewService {
         dto.setReviewDate(review.getReviewDate());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<ReviewResponseDTO> searchByReviewType(ReviewType reviewType) {
+
+        return mapToDTOList(reviewRepository.findByReviewType(reviewType));
+    }
+
+    @Override
+    public List<ReviewResponseDTO> searchByRating(Integer rating) {
+
+        return mapToDTOList(reviewRepository.findByRating(rating));
+    }
+
+    @Override
+    public List<ReviewResponseDTO> searchByMinimumRating(Integer rating) {
+
+        return mapToDTOList(reviewRepository.findByRatingGreaterThanEqual(rating));
+    }
+
+    @Override
+    public List<ReviewResponseDTO> searchByReviewDate(LocalDateTime startDate, LocalDateTime endDate) {
+
+        return mapToDTOList(reviewRepository.findByReviewDateBetween(startDate, endDate));
+    }
+
+    private List<ReviewResponseDTO> mapToDTOList(List<Review> reviews) {
+
+        return reviews.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
 }

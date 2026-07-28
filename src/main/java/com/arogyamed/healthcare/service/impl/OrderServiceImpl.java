@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderServiceImpl
-        implements OrderService {
+public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
@@ -118,5 +117,57 @@ public class OrderServiceImpl
         dto.setOrderDate(order.getOrderDate());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<OrderResponseDTO> searchByPatientName(String fullName) {
+
+        return mapToDTOList(
+                orderRepository.findByPatient_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<OrderResponseDTO> searchByPatientEmail(String email) {
+
+        return mapToDTOList(orderRepository.findByPatient_User_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<OrderResponseDTO> searchByPharmacistName(String fullName) {
+
+        return mapToDTOList(orderRepository.findByPharmacist_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<OrderResponseDTO> searchByPharmacistEmail(String email) {
+
+        return mapToDTOList(orderRepository.findByPharmacist_User_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<OrderResponseDTO> searchByStatus(OrderStatus status) {
+
+        return mapToDTOList(orderRepository.findByStatus(status));
+    }
+
+    @Override
+    public List<OrderResponseDTO> searchByTotalAmount(Double totalAmount) {
+
+        return mapToDTOList(orderRepository.findByTotalAmount(totalAmount));
+    }
+
+    @Override
+    public List<OrderResponseDTO> searchByOrderDate(LocalDateTime startDate, LocalDateTime endDate) {
+
+        return mapToDTOList(orderRepository.findByOrderDateBetween(startDate, endDate));
+    }
+
+    private List<OrderResponseDTO> mapToDTOList(List<Order> orders) {
+
+        return orders.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

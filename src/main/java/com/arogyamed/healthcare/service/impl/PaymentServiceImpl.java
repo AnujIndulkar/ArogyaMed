@@ -8,6 +8,7 @@ import com.arogyamed.healthcare.model.PaymentStatus;
 import com.arogyamed.healthcare.repository.OrderRepository;
 import com.arogyamed.healthcare.repository.PaymentRepository;
 import com.arogyamed.healthcare.service.PaymentService;
+import com.arogyamed.healthcare.model.PaymentMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class PaymentServiceImpl
-        implements PaymentService {
+public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private PaymentRepository paymentRepository;
@@ -114,5 +114,68 @@ public class PaymentServiceImpl
         dto.setPaymentDate(payment.getPaymentDate());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<PaymentResponseDTO> searchByOrderId(Long orderId) {
+
+        return mapToDTOList(paymentRepository.findByOrderId(orderId));
+    }
+
+    @Override
+    public List<PaymentResponseDTO> searchByPatientName(String fullName) {
+
+        return mapToDTOList(paymentRepository.findByOrder_Patient_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<PaymentResponseDTO> searchByPatientEmail(String email) {
+
+        return mapToDTOList(paymentRepository.findByOrder_Patient_User_EmailContainingIgnoreCase(email));
+    }
+
+    @Override
+    public List<PaymentResponseDTO> searchByPharmacistName(String fullName) {
+
+        return mapToDTOList(paymentRepository.findByOrder_Pharmacist_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<PaymentResponseDTO> searchByPaymentStatus(PaymentStatus paymentStatus) {
+
+        return mapToDTOList(paymentRepository.findByPaymentStatus(paymentStatus));
+    }
+
+    @Override
+    public List<PaymentResponseDTO> searchByPaymentMethod(PaymentMethod paymentMethod) {
+
+        return mapToDTOList(paymentRepository.findByPaymentMethod(paymentMethod));
+    }
+
+    @Override
+    public List<PaymentResponseDTO> searchByTransactionId(String transactionId) {
+
+        return mapToDTOList(paymentRepository.findByTransactionIdContainingIgnoreCase(transactionId));
+    }
+
+    @Override
+    public List<PaymentResponseDTO> searchByAmount(Double amount) {
+
+        return mapToDTOList(paymentRepository.findByAmount(amount));
+    }
+
+    @Override
+    public List<PaymentResponseDTO> searchByPaymentDate(LocalDateTime startDate, LocalDateTime endDate) {
+
+        return mapToDTOList(paymentRepository.findByPaymentDateBetween(startDate, endDate));
+    }
+
+    private List<PaymentResponseDTO> mapToDTOList(List<Payment> payments) {
+
+        return payments.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

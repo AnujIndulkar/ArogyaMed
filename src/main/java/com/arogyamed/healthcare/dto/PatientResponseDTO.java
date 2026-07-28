@@ -33,5 +33,29 @@ public class PatientResponseDTO {
 
     private LocalDate dateOfBirth;
 
+    private String emergencyContactName;
+
+    private String emergencyContactNumber;
+
+    private String occupation;
+
+    private String maritalStatus;
+
+    private String profileImage;
+
+    private String insuranceProvider;
+
+    private String insurancePolicyNumber;
+
+    private String city;
+
+    private String district;
+
+    private String state;
+
+    private String country;
+
+    private String pincode;
+
     // getters & setters
 }

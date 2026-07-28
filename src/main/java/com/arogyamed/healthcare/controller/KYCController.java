@@ -3,6 +3,7 @@ package com.arogyamed.healthcare.controller;
 import com.arogyamed.healthcare.dto.KYCRequestDTO;
 import com.arogyamed.healthcare.dto.KYCResponseDTO;
 import com.arogyamed.healthcare.service.KYCService;
+import com.arogyamed.healthcare.model.KYCStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +50,44 @@ public class KYCController {
     @PutMapping("/{id}/reject")
     public KYCResponseDTO rejectKYC(@PathVariable Long id, @RequestParam String remarks) {
         return kycService.rejectKYC(id, remarks);
+    }
+
+    // ================= Search =================
+
+    // Search by Full Name
+    @GetMapping("/search/full-name")
+    public List<KYCResponseDTO> searchByFullName(@RequestParam String fullName) {
+        return kycService.searchByFullName(fullName);
+    }
+
+    // Search by Email
+    @GetMapping("/search/email")
+    public List<KYCResponseDTO> searchByEmail(@RequestParam String email) {
+        return kycService.searchByEmail(email);
+    }
+
+    // Search by Document Type
+    @GetMapping("/search/document-type")
+    public List<KYCResponseDTO> searchByDocumentType(@RequestParam String documentType) {
+        return kycService.searchByDocumentType(documentType);
+    }
+
+    // Search by Document Number
+    @GetMapping("/search/document-number")
+    public List<KYCResponseDTO> searchByDocumentNumber(@RequestParam String documentNumber) {
+        return kycService.searchByDocumentNumber(documentNumber);
+    }
+
+    // Search by Status
+    @GetMapping("/search/status")
+    public List<KYCResponseDTO> searchByStatus(@RequestParam KYCStatus status) {
+        return kycService.searchByStatus(status);
+    }
+
+    // Search by Remarks
+    @GetMapping("/search/remarks")
+    public List<KYCResponseDTO> searchByRemarks(@RequestParam String remarks) {
+        return kycService.searchByRemarks(remarks);
     }
 
 }

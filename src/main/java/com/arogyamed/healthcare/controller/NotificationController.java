@@ -5,6 +5,8 @@ import com.arogyamed.healthcare.dto.NotificationResponseDTO;
 import com.arogyamed.healthcare.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.arogyamed.healthcare.model.NotificationType;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -38,6 +40,39 @@ public class NotificationController {
     @PutMapping("/{id}/read")
     public NotificationResponseDTO markAsRead(@PathVariable Long id) {
         return notificationService.markAsRead(id);
+    }
+
+    // ================= Search =================
+
+    // Search by User ID
+    @GetMapping("/search/user")
+    public List<NotificationResponseDTO> searchByUserId(@RequestParam Long userId) {
+        return notificationService.searchByUserId(userId);
+    }
+
+    // Search by User Email
+    @GetMapping("/search/email")
+    public List<NotificationResponseDTO> searchByUserEmail(@RequestParam String email) {
+        return notificationService.searchByUserEmail(email);
+    }
+
+    // Search by Notification Type
+    @GetMapping("/search/type")
+    public List<NotificationResponseDTO> searchByType(@RequestParam NotificationType type) {
+        return notificationService.searchByType(type);
+    }
+
+    // Search by Read Status
+    @GetMapping("/search/read-status")
+    public List<NotificationResponseDTO> searchByReadStatus(@RequestParam Boolean isRead) {
+        return notificationService.searchByReadStatus(isRead);
+    }
+
+    // Search by Created Date Range
+    @GetMapping("/search/date")
+    public List<NotificationResponseDTO> searchByCreatedDate(@RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate) {
+
+        return notificationService.searchByCreatedDate(startDate, endDate);
     }
 
 }

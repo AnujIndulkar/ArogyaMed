@@ -10,12 +10,12 @@ import com.arogyamed.healthcare.service.MedicalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class MedicalRecordServiceImpl
-        implements MedicalRecordService {
+public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Autowired
     private MedicalRecordRepository medicalRecordRepository;
@@ -91,5 +91,50 @@ public class MedicalRecordServiceImpl
         dto.setVisitDate(medicalRecord.getVisitDate());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<MedicalRecordResponseDTO> searchByPatientName(String fullName) {
+
+        return mapToDTOList(medicalRecordRepository.findByPatient_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<MedicalRecordResponseDTO> searchByDiagnosis(String diagnosis) {
+
+        return mapToDTOList(medicalRecordRepository.findByDiagnosisContainingIgnoreCase(diagnosis));
+    }
+
+    @Override
+    public List<MedicalRecordResponseDTO> searchByTreatment(String treatment) {
+
+        return mapToDTOList(medicalRecordRepository.findByTreatmentContainingIgnoreCase(treatment));
+    }
+
+    @Override
+    public List<MedicalRecordResponseDTO> searchByDoctorNotes(String doctorNotes) {
+
+        return mapToDTOList(medicalRecordRepository.findByDoctorNotesContainingIgnoreCase(doctorNotes));
+    }
+
+    @Override
+    public List<MedicalRecordResponseDTO> searchByVisitDate(LocalDate visitDate) {
+
+        return mapToDTOList(medicalRecordRepository.findByVisitDate(visitDate));
+    }
+
+    @Override
+    public List<MedicalRecordResponseDTO> searchByVisitDateRange(LocalDate startDate, LocalDate endDate) {
+
+        return mapToDTOList(medicalRecordRepository.findByVisitDateBetween(startDate, endDate));
+    }
+
+    private List<MedicalRecordResponseDTO> mapToDTOList(List<MedicalRecord> medicalRecords) {
+
+        return medicalRecords.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

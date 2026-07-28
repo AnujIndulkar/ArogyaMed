@@ -4,6 +4,7 @@ import com.arogyamed.healthcare.dto.SOSRequestDTO;
 import com.arogyamed.healthcare.dto.SOSResponseDTO;
 import com.arogyamed.healthcare.model.Patient;
 import com.arogyamed.healthcare.model.SOS;
+import com.arogyamed.healthcare.model.SOSStatus;
 import com.arogyamed.healthcare.repository.PatientRepository;
 import com.arogyamed.healthcare.repository.SOSRepository;
 import com.arogyamed.healthcare.service.SOSService;
@@ -108,5 +109,44 @@ public class SOSServiceImpl implements SOSService {
         dto.setCreatedAt(sos.getCreatedAt());
 
         return dto;
+    }
+
+    // ================= Search =================
+
+    @Override
+    public List<SOSResponseDTO> searchByPatientName(String fullName) {
+
+        return mapToDTOList(sosRepository.findByPatient_User_FullNameContainingIgnoreCase(fullName));
+    }
+
+    @Override
+    public List<SOSResponseDTO> searchByEmergencyType(String emergencyType) {
+
+        return mapToDTOList(sosRepository.findByEmergencyTypeContainingIgnoreCase(emergencyType));
+    }
+
+    @Override
+    public List<SOSResponseDTO> searchByLocation(String location) {
+
+        return mapToDTOList(sosRepository.findByLocationContainingIgnoreCase(location));
+    }
+
+    @Override
+    public List<SOSResponseDTO> searchByStatus(SOSStatus status) {
+
+        return mapToDTOList(sosRepository.findByStatus(status));
+    }
+
+    @Override
+    public List<SOSResponseDTO> searchByCreatedDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+
+        return mapToDTOList(sosRepository.findByCreatedAtBetween(startDate, endDate));
+    }
+
+    private List<SOSResponseDTO> mapToDTOList(List<SOS> sosList) {
+
+        return sosList.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }
