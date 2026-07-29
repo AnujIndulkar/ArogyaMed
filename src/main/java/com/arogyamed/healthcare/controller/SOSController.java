@@ -3,6 +3,7 @@ package com.arogyamed.healthcare.controller;
 import com.arogyamed.healthcare.dto.SOSRequestDTO;
 import com.arogyamed.healthcare.dto.SOSResponseDTO;
 import com.arogyamed.healthcare.service.SOSService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.arogyamed.healthcare.model.SOSStatus;
@@ -18,7 +19,7 @@ public class SOSController {
     private SOSService sosService;
 
     @PostMapping
-    public SOSResponseDTO createSOS(@RequestBody SOSRequestDTO request) {
+    public SOSResponseDTO createSOS(@Valid @RequestBody SOSRequestDTO request) {
         return sosService.createSOS(request);
     }
 
@@ -28,7 +29,7 @@ public class SOSController {
     }
 
     @PutMapping("/{id}")
-    public SOSResponseDTO updateSOS(@PathVariable Long id, @RequestBody SOSRequestDTO request) {
+    public SOSResponseDTO updateSOS(@PathVariable Long id, @Valid @RequestBody SOSRequestDTO request)  {
         return sosService.updateSOS(id, request);
     }
 

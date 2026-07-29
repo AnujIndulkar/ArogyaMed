@@ -6,6 +6,7 @@ import com.arogyamed.healthcare.dto.BarcodeQRCodeResponseDTO;
 import com.arogyamed.healthcare.model.BarcodeType;
 import com.arogyamed.healthcare.model.VerificationStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface BarcodeQRCodeService {
@@ -34,4 +35,50 @@ public interface BarcodeQRCodeService {
 
     BarcodeDashboardDTO getBarcodeDashboard();
 
+    // ================= Verification / Status Actions =================
+
+    BarcodeQRCodeResponseDTO flagAsCounterfeit(String barcode, String remarks);
+
+    BarcodeQRCodeResponseDTO activate(Long id);
+
+    BarcodeQRCodeResponseDTO deactivate(Long id);
+
+    // ================= Enterprise Search & Filtering =================
+
+    List<BarcodeQRCodeResponseDTO> searchByMedicineName(String medicineName);
+
+    List<BarcodeQRCodeResponseDTO> searchByGenericName(String genericName);
+
+    List<BarcodeQRCodeResponseDTO> searchByCompanyName(String companyName);
+
+    List<BarcodeQRCodeResponseDTO> searchByBatchNumber(String batchNumber);
+
+    List<BarcodeQRCodeResponseDTO> searchByBarcode(String barcode);
+
+    List<BarcodeQRCodeResponseDTO> searchByQrCode(String qrCode);
+
+    List<BarcodeQRCodeResponseDTO> searchByManufacturingDateRange(LocalDate startDate, LocalDate endDate);
+
+    List<BarcodeQRCodeResponseDTO> searchByExpiryDateRange(LocalDate startDate, LocalDate endDate);
+
+    List<BarcodeQRCodeResponseDTO> searchExpired();
+
+    List<BarcodeQRCodeResponseDTO> searchByScanCountMin(Integer minScans);
+
+    List<BarcodeQRCodeResponseDTO> searchByScanCountRange(Integer minScans, Integer maxScans);
+
+    List<BarcodeQRCodeResponseDTO> searchCounterfeit();
+
+    List<BarcodeQRCodeResponseDTO> searchActive();
+
+    List<BarcodeQRCodeResponseDTO> searchInactive();
+
+    List<BarcodeQRCodeResponseDTO> searchBarcodes(
+            VerificationStatus verificationStatus,
+            BarcodeType barcodeType,
+            Boolean active,
+            Boolean counterfeitDetected,
+            String medicineName,
+            String companyName
+    );
 }

@@ -5,6 +5,7 @@ import com.arogyamed.healthcare.dto.LoginResponseDTO;
 import com.arogyamed.healthcare.dto.RegisterRequestDTO;
 import com.arogyamed.healthcare.dto.RegisterResponseDTO;
 import com.arogyamed.healthcare.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,7 @@ public class AuthController {
 
     // Register New User
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDTO> register(
-            @RequestBody RegisterRequestDTO request) {
+    public ResponseEntity<RegisterResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
 
         System.out.println("REGISTER API CALLED");
 
@@ -32,10 +32,12 @@ public class AuthController {
 
     // Login User
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
 
         return ResponseEntity.ok(authService.login(request));
     }
+
+
 
 
 }

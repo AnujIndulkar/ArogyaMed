@@ -1,9 +1,9 @@
 package com.arogyamed.healthcare.model;
 
-import com.arogyamed.healthcare.model.DocumentModule;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -55,4 +55,40 @@ public class Document {
     @Builder.Default
     @Column(name = "uploaded_at")
     private LocalDateTime uploadedAt = LocalDateTime.now();
+
+    // ==========================================================
+    // MODULE 30 - DOCUMENT MANAGEMENT SEARCH & FILTERING FIELDS
+    // ==========================================================
+
+    // Type of document content (Aadhaar, PAN, GST, Medical License, etc.)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "document_type")
+    private DocumentType documentType;
+
+    // Actual ID / License / Registration number printed on the document
+    @Column(name = "document_number")
+    private String documentNumber;
+
+    // Role of the user who uploaded the document (denormalized for fast filtering)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "verification_status")
+    private VerificationStatus verificationStatus = VerificationStatus.PENDING;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "verified_by")
+    private User verifiedBy;
+
+    @Column(name = "verified_at")
+    private LocalDateTime verifiedAt;
+
+    @Column(name = "expiry_date")
+    private LocalDate expiryDate;
+
+    @Column(name = "rejection_reason", length = 1000)
+    private String rejectionReason;
 }

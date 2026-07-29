@@ -3,6 +3,7 @@ package com.arogyamed.healthcare.controller;
 import com.arogyamed.healthcare.dto.InventoryRequestDTO;
 import com.arogyamed.healthcare.dto.InventoryResponseDTO;
 import com.arogyamed.healthcare.service.InventoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public class InventoryController {
     private InventoryService inventoryService;
 
     @PostMapping
-    public InventoryResponseDTO createInventory(@RequestBody InventoryRequestDTO request) {
+    public InventoryResponseDTO createInventory(@Valid @RequestBody InventoryRequestDTO request) {
         return inventoryService.createInventory(request);
     }
 
@@ -27,7 +28,7 @@ public class InventoryController {
     }
 
     @PutMapping("/{id}")
-    public InventoryResponseDTO updateInventory(@PathVariable Long id, @RequestBody InventoryRequestDTO request) {
+    public InventoryResponseDTO updateInventory(@PathVariable Long id, @Valid @RequestBody InventoryRequestDTO request) {
         return inventoryService.updateInventory(id, request);
     }
 

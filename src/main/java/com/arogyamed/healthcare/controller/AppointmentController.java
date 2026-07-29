@@ -3,6 +3,7 @@ package com.arogyamed.healthcare.controller;
 import com.arogyamed.healthcare.dto.AppointmentRequestDTO;
 import com.arogyamed.healthcare.dto.AppointmentResponseDTO;
 import com.arogyamed.healthcare.service.AppointmentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class AppointmentController {
     private AppointmentService appointmentService;
 
     @PostMapping
-    public AppointmentResponseDTO createAppointment(@RequestBody AppointmentRequestDTO request) {
+    public AppointmentResponseDTO createAppointment(@Valid @RequestBody AppointmentRequestDTO request) {
         return appointmentService.createAppointment(request);
     }
 
@@ -26,7 +27,7 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
-    public AppointmentResponseDTO updateAppointment(@PathVariable Long id, @RequestBody AppointmentRequestDTO request) {
+    public AppointmentResponseDTO updateAppointment(@PathVariable Long id, @Valid @RequestBody AppointmentRequestDTO request) {
         return appointmentService.updateAppointment(id, request);
     }
 

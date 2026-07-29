@@ -35,10 +35,10 @@ public class AmbulanceBookingServiceImpl
     public AmbulanceBookingResponseDTO createBooking(AmbulanceBookingRequestDTO request) {
 
         Patient patient = patientRepository.findById(request.getPatientId()).orElseThrow(() ->
-                        new RuntimeException("Patient not found"));
+                new RuntimeException("Patient not found"));
 
         Ambulance ambulance = ambulanceRepository.findById(request.getAmbulanceId()).orElseThrow(() ->
-                        new RuntimeException("Ambulance not found"));
+                new RuntimeException("Ambulance not found"));
 
         // Check ambulance availability
         if (!ambulance.isAvailable()) {
@@ -54,7 +54,7 @@ public class AmbulanceBookingServiceImpl
         if (request.getBookingType() == BookingType.SOS) {
 
             SOS sos = sosRepository.findById(request.getSosId()).orElseThrow(() ->
-                            new RuntimeException("SOS Request not found"));
+                    new RuntimeException("SOS Request not found"));
 
             booking.setSos(sos);
 
@@ -74,6 +74,14 @@ public class AmbulanceBookingServiceImpl
 
         booking.setBookedAt(LocalDateTime.now());
 
+        booking.setHospitalName(request.getHospitalName());
+
+        booking.setEmergencyLevel(request.getEmergencyLevel());
+
+        booking.setPaymentStatus(request.getPaymentStatus());
+
+        booking.setEtaMinutes(request.getEtaMinutes());
+
         // Update Ambulance
         ambulance.setAvailable(false);
         ambulance.setStatus(AmbulanceStatus.ON_DUTY);
@@ -89,7 +97,7 @@ public class AmbulanceBookingServiceImpl
     public AmbulanceBookingResponseDTO getBookingById(Long id) {
 
         AmbulanceBooking booking = bookingRepository.findById(id).orElseThrow(() ->
-                                new RuntimeException("Booking not found"));
+                new RuntimeException("Booking not found"));
 
         return mapToDTO(booking);
     }
@@ -97,13 +105,21 @@ public class AmbulanceBookingServiceImpl
     public AmbulanceBookingResponseDTO updateBooking(Long id, AmbulanceBookingRequestDTO request) {
 
         AmbulanceBooking booking = bookingRepository.findById(id).orElseThrow(() ->
-                        new RuntimeException("Booking not found"));
+                new RuntimeException("Booking not found"));
 
         booking.setPickupLocation(request.getPickupLocation());
 
         booking.setDestination(request.getDestination());
 
         booking.setStatus(request.getStatus());
+
+        booking.setHospitalName(request.getHospitalName());
+
+        booking.setEmergencyLevel(request.getEmergencyLevel());
+
+        booking.setPaymentStatus(request.getPaymentStatus());
+
+        booking.setEtaMinutes(request.getEtaMinutes());
 
         // If booking is completed
         if (request.getStatus() == BookingStatus.COMPLETED) {
@@ -144,6 +160,135 @@ public class AmbulanceBookingServiceImpl
                 .collect(Collectors.toList());
     }
 
+    // ================= Enterprise Search & Filtering =================
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByPatientId(Long patientId) {
+        return bookingRepository.findByPatient_Id(patientId)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByPatientName(String patientName) {
+        return bookingRepository.findByPatient_User_FullNameContainingIgnoreCase(patientName)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByAmbulanceId(Long ambulanceId) {
+        return bookingRepository.findByAmbulance_Id(ambulanceId)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByVehicleNumber(String vehicleNumber) {
+        return bookingRepository.findByAmbulance_AmbulanceNumberContainingIgnoreCase(vehicleNumber)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByDriverName(String driverName) {
+        return bookingRepository.findByAmbulance_DriverNameContainingIgnoreCase(driverName)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByDriverPhone(String driverPhone) {
+        return bookingRepository.findByAmbulance_DriverPhone(driverPhone)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByHospitalName(String hospitalName) {
+        return bookingRepository.findByHospitalNameContainingIgnoreCase(hospitalName)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByPickupLocation(String pickupLocation) {
+        return bookingRepository.findByPickupLocationContainingIgnoreCase(pickupLocation)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByDestination(String destination) {
+        return bookingRepository.findByDestinationContainingIgnoreCase(destination)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByStatus(BookingStatus status) {
+        return bookingRepository.findByStatus(status)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByBookingType(BookingType bookingType) {
+        return bookingRepository.findByBookingType(bookingType)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByEmergencyLevel(EmergencyLevel emergencyLevel) {
+        return bookingRepository.findByEmergencyLevel(emergencyLevel)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByStatusAndEmergencyLevel(BookingStatus status, EmergencyLevel emergencyLevel) {
+        return bookingRepository.findByStatusAndEmergencyLevel(status, emergencyLevel)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByPaymentStatus(PaymentStatus paymentStatus) {
+        return bookingRepository.findByPaymentStatus(paymentStatus)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByEtaMax(Integer maxEta) {
+        return bookingRepository.findByEtaMinutesLessThanEqual(maxEta)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByEtaRange(Integer minEta, Integer maxEta) {
+        return bookingRepository.findByEtaMinutesBetween(minEta, maxEta)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return bookingRepository.findByBookedAtBetween(startDate, endDate)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchByPatientAndStatus(Long patientId, BookingStatus status) {
+        return bookingRepository.findByPatient_IdAndStatus(patientId, status)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AmbulanceBookingResponseDTO> searchBookings(
+            BookingStatus status,
+            EmergencyLevel emergencyLevel,
+            PaymentStatus paymentStatus,
+            BookingType bookingType,
+            Long patientId,
+            Long ambulanceId,
+            LocalDateTime startDate,
+            LocalDateTime endDate) {
+
+        return bookingRepository.searchBookings(
+                        status, emergencyLevel, paymentStatus, bookingType,
+                        patientId, ambulanceId, startDate, endDate)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    // ================= Helper =================
+
     private AmbulanceBookingResponseDTO mapToDTO(AmbulanceBooking booking) {
 
         AmbulanceBookingResponseDTO dto = new AmbulanceBookingResponseDTO();
@@ -157,6 +302,10 @@ public class AmbulanceBookingServiceImpl
         dto.setAmbulanceId(booking.getAmbulance().getId());
 
         dto.setAmbulanceNumber(booking.getAmbulance().getAmbulanceNumber());
+
+        dto.setDriverName(booking.getAmbulance().getDriverName());
+
+        dto.setDriverPhone(booking.getAmbulance().getDriverPhone());
 
         if (booking.getSos() != null) {
 
@@ -174,6 +323,14 @@ public class AmbulanceBookingServiceImpl
         dto.setBookedAt(booking.getBookedAt());
 
         dto.setCompletedAt(booking.getCompletedAt());
+
+        dto.setHospitalName(booking.getHospitalName());
+
+        dto.setEmergencyLevel(booking.getEmergencyLevel());
+
+        dto.setPaymentStatus(booking.getPaymentStatus());
+
+        dto.setEtaMinutes(booking.getEtaMinutes());
 
         return dto;
     }

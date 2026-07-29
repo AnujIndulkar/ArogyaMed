@@ -3,8 +3,11 @@ package com.arogyamed.healthcare.service.impl;
 import com.arogyamed.healthcare.dto.DocumentRequestDTO;
 import com.arogyamed.healthcare.dto.DocumentResponseDTO;
 import com.arogyamed.healthcare.model.Document;
-import com.arogyamed.healthcare.model.User;
 import com.arogyamed.healthcare.model.DocumentModule;
+import com.arogyamed.healthcare.model.DocumentType;
+import com.arogyamed.healthcare.model.Role;
+import com.arogyamed.healthcare.model.User;
+import com.arogyamed.healthcare.model.VerificationStatus;
 import com.arogyamed.healthcare.repository.DocumentRepository;
 import com.arogyamed.healthcare.repository.UserRepository;
 import com.arogyamed.healthcare.service.DocumentService;
@@ -22,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -43,7 +47,7 @@ public class DocumentServiceImpl implements DocumentService {
         try {
 
             User user = userRepository.findById(requestDTO.getUploadedBy()).orElseThrow(() ->
-                            new RuntimeException("User not found with ID : " + requestDTO.getUploadedBy()));
+                    new RuntimeException("User not found with ID : " + requestDTO.getUploadedBy()));
 
             System.out.println("User Found : " + user.getId());
 
@@ -76,6 +80,8 @@ public class DocumentServiceImpl implements DocumentService {
 
             System.out.println("File copied successfully.");
 
+            Role effectiveRole = requestDTO.getRole() != null ? requestDTO.getRole() : user.getRole();
+
             Document document = Document.builder()
                     .fileName(originalFileName)
                     .storedFileName(storedFileName)
@@ -88,6 +94,11 @@ public class DocumentServiceImpl implements DocumentService {
                     .uploadedBy(user)
                     .uploadedAt(LocalDateTime.now())
                     .active(true)
+                    .documentType(requestDTO.getDocumentType())
+                    .documentNumber(requestDTO.getDocumentNumber())
+                    .role(effectiveRole)
+                    .verificationStatus(VerificationStatus.PENDING)
+                    .expiryDate(requestDTO.getExpiryDate())
                     .build();
 
             System.out.println("Saving document...");
@@ -139,7 +150,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         try {
             Document document = documentRepository.findById(documentId).orElseThrow(() ->
-                            new RuntimeException("Document not found with ID : " + documentId));
+                    new RuntimeException("Document not found with ID : " + documentId));
 
             Path filePath = Paths.get(document.getStoragePath());
 
@@ -161,12 +172,200 @@ public class DocumentServiceImpl implements DocumentService {
     public void deleteDocument(Long documentId) {
 
         Document document = documentRepository.findById(documentId).orElseThrow(() ->
-                        new RuntimeException("Document not found with ID: " + documentId));
+                new RuntimeException("Document not found with ID: " + documentId));
 
         document.setActive(false);
 
         documentRepository.save(document);
     }
+
+    // ================= Verification Actions =================
+
+    @Override
+    public DocumentResponseDTO verifyDocument(Long documentId, Long verifiedByUserId) {
+
+        Document document = documentRepository.findById(documentId).orElseThrow(() ->
+                new RuntimeException("Document not found with ID : " + documentId));
+
+        User verifier = userRepository.findById(verifiedByUserId).orElseThrow(() ->
+                new RuntimeException("User not found with ID : " + verifiedByUserId));
+
+        document.setVerificationStatus(VerificationStatus.VERIFIED);
+        document.setVerifiedBy(verifier);
+        document.setVerifiedAt(LocalDateTime.now());
+        document.setRejectionReason(null);
+
+        return convertToResponseDTO(documentRepository.save(document));
+    }
+
+    @Override
+    public DocumentResponseDTO rejectDocument(Long documentId, Long verifiedByUserId, String rejectionReason) {
+
+        Document document = documentRepository.findById(documentId).orElseThrow(() ->
+                new RuntimeException("Document not found with ID : " + documentId));
+
+        User verifier = userRepository.findById(verifiedByUserId).orElseThrow(() ->
+                new RuntimeException("User not found with ID : " + verifiedByUserId));
+
+        document.setVerificationStatus(VerificationStatus.REJECTED);
+        document.setVerifiedBy(verifier);
+        document.setVerifiedAt(LocalDateTime.now());
+        document.setRejectionReason(rejectionReason);
+
+        return convertToResponseDTO(documentRepository.save(document));
+    }
+
+    // ================= Enterprise Search & Filtering =================
+
+    @Override
+    public List<DocumentResponseDTO> searchByUserId(Long userId) {
+        return documentRepository.findByUploadedBy_Id(userId)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByUserName(String fullName) {
+        return documentRepository.findByUploadedBy_FullNameContainingIgnoreCase(fullName)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByRole(Role role) {
+        return documentRepository.findByRole(role)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByDocumentType(DocumentType documentType) {
+        return documentRepository.findByDocumentType(documentType)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByDocumentNumber(String documentNumber) {
+        return documentRepository.findByDocumentNumberContainingIgnoreCase(documentNumber)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByVerificationStatus(VerificationStatus verificationStatus) {
+        return documentRepository.findByVerificationStatus(verificationStatus)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchVerifiedDocuments() {
+        return searchByVerificationStatus(VerificationStatus.VERIFIED);
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchPendingDocuments() {
+        return searchByVerificationStatus(VerificationStatus.PENDING);
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchRejectedDocuments() {
+        return searchByVerificationStatus(VerificationStatus.REJECTED);
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByVerifiedById(Long verifiedByUserId) {
+        return documentRepository.findByVerifiedBy_Id(verifiedByUserId)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByVerifiedByName(String verifiedByName) {
+        return documentRepository.findByVerifiedBy_FullNameContainingIgnoreCase(verifiedByName)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByUploadDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return documentRepository.findByUploadedAtBetween(startDate, endDate)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByExpiryDateRange(LocalDate startDate, LocalDate endDate) {
+        return documentRepository.findByExpiryDateBetween(startDate, endDate)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchExpiredDocuments() {
+        return documentRepository.findByExpiryDateBefore(LocalDate.now())
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchExpiringSoon(int days) {
+        LocalDate today = LocalDate.now();
+        LocalDate upperBound = today.plusDays(days);
+        return documentRepository.findByExpiryDateBetween(today, upperBound)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByFileType(String fileType) {
+        return documentRepository.findByFileTypeContainingIgnoreCase(fileType)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByFileSizeMin(Long minSize) {
+        return documentRepository.findByFileSizeGreaterThanEqual(minSize)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByFileSizeMax(Long maxSize) {
+        return documentRepository.findByFileSizeLessThanEqual(maxSize)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByFileSizeRange(Long minSize, Long maxSize) {
+        return documentRepository.findByFileSizeBetween(minSize, maxSize)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByRoleAndDocumentType(Role role, DocumentType documentType) {
+        return documentRepository.findByRoleAndDocumentType(role, documentType)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByRoleAndVerificationStatus(Role role, VerificationStatus verificationStatus) {
+        return documentRepository.findByRoleAndVerificationStatus(role, verificationStatus)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchByDocumentTypeAndVerificationStatus(DocumentType documentType, VerificationStatus verificationStatus) {
+        return documentRepository.findByDocumentTypeAndVerificationStatus(documentType, verificationStatus)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> searchDocuments(
+            Role role,
+            DocumentType documentType,
+            VerificationStatus verificationStatus,
+            String fileType,
+            Long uploadedById,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Boolean active) {
+
+        return documentRepository.searchDocuments(
+                        role, documentType, verificationStatus, fileType,
+                        uploadedById, startDate, endDate, active)
+                .stream().map(this::convertToResponseDTO).toList();
+    }
+
+    // ================= Helpers =================
 
     private DocumentResponseDTO convertToResponseDTO(Document document) {
 
@@ -179,6 +378,18 @@ public class DocumentServiceImpl implements DocumentService {
                 .documentModule(document.getDocumentModule())
                 .uploadedAt(document.getUploadedAt())
                 .downloadUrl(generateDownloadUrl(document.getId()))
+                .documentType(document.getDocumentType())
+                .documentNumber(document.getDocumentNumber())
+                .role(document.getRole())
+                .uploadedById(document.getUploadedBy() != null ? document.getUploadedBy().getId() : null)
+                .uploadedByName(document.getUploadedBy() != null ? document.getUploadedBy().getFullName() : null)
+                .verificationStatus(document.getVerificationStatus())
+                .verifiedById(document.getVerifiedBy() != null ? document.getVerifiedBy().getId() : null)
+                .verifiedByName(document.getVerifiedBy() != null ? document.getVerifiedBy().getFullName() : null)
+                .verifiedAt(document.getVerifiedAt())
+                .expiryDate(document.getExpiryDate())
+                .expired(document.getExpiryDate() != null && document.getExpiryDate().isBefore(LocalDate.now()))
+                .rejectionReason(document.getRejectionReason())
                 .build();
     }
 

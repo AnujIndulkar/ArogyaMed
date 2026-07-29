@@ -27,4 +27,6 @@ public class BarcodeQRCodeRequestDTO {
 
     private String remarks;
 
+    private Boolean active;
+
 }

@@ -2,6 +2,8 @@ package com.arogyamed.healthcare.dto;
 
 import com.arogyamed.healthcare.model.BookingStatus;
 import com.arogyamed.healthcare.model.BookingType;
+import com.arogyamed.healthcare.model.EmergencyLevel;
+import com.arogyamed.healthcare.model.PaymentStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +24,10 @@ public class AmbulanceBookingResponseDTO {
 
     private String ambulanceNumber;
 
+    private String driverName;
+
+    private String driverPhone;
+
     private Long sosId;
 
     private BookingType bookingType;
@@ -35,4 +41,12 @@ public class AmbulanceBookingResponseDTO {
     private LocalDateTime bookedAt;
 
     private LocalDateTime completedAt;
+
+    private String hospitalName;
+
+    private EmergencyLevel emergencyLevel;
+
+    private PaymentStatus paymentStatus;
+
+    private Integer etaMinutes;
 }

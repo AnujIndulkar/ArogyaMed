@@ -44,6 +44,19 @@ public class BarcodeQRCode {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    // ==========================================================
+    // SEARCH & FILTERING FIELDS
+    // ==========================================================
+
+    @Column(name = "active")
+    private Boolean active;
+
+    @Column(name = "counterfeit_detected")
+    private Boolean counterfeitDetected;
+
+    @Column(name = "counterfeit_detected_at")
+    private LocalDateTime counterfeitDetectedAt;
+
     @PrePersist
     public void prePersist() {
 
@@ -55,6 +68,14 @@ public class BarcodeQRCode {
 
         if (verificationStatus == null) {
             verificationStatus = VerificationStatus.PENDING;
+        }
+
+        if (active == null) {
+            active = true;
+        }
+
+        if (counterfeitDetected == null) {
+            counterfeitDetected = false;
         }
 
     }

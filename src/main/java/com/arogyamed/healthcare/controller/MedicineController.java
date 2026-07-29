@@ -3,6 +3,7 @@ package com.arogyamed.healthcare.controller;
 import com.arogyamed.healthcare.dto.MedicineRequestDTO;
 import com.arogyamed.healthcare.dto.MedicineResponseDTO;
 import com.arogyamed.healthcare.service.MedicineService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class MedicineController {
     private MedicineService medicineService;
 
     @PostMapping
-    public MedicineResponseDTO createMedicine(@RequestBody MedicineRequestDTO request) {
+    public MedicineResponseDTO createMedicine(@Valid @RequestBody MedicineRequestDTO request) {
 
         return medicineService.createMedicine(request);
     }
@@ -34,7 +35,7 @@ public class MedicineController {
     }
 
     @PutMapping("/{id}")
-    public MedicineResponseDTO updateMedicine(@PathVariable Long id, @RequestBody MedicineRequestDTO request) {
+    public MedicineResponseDTO updateMedicine(@PathVariable Long id, @Valid @RequestBody MedicineRequestDTO request) {
 
         return medicineService.updateMedicine(id, request);
     }

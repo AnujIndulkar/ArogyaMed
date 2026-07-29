@@ -2,6 +2,8 @@ package com.arogyamed.healthcare.dto;
 
 import com.arogyamed.healthcare.model.BookingStatus;
 import com.arogyamed.healthcare.model.BookingType;
+import com.arogyamed.healthcare.model.EmergencyLevel;
+import com.arogyamed.healthcare.model.PaymentStatus;
 import lombok.*;
 
 @Getter
@@ -23,4 +25,12 @@ public class AmbulanceBookingRequestDTO {
     private String destination;
 
     private BookingStatus status;
+
+    private String hospitalName;
+
+    private EmergencyLevel emergencyLevel;
+
+    private PaymentStatus paymentStatus;
+
+    private Integer etaMinutes;
 }
