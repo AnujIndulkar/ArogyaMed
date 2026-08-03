@@ -36,6 +36,9 @@ public class User {
 
     private boolean verified;
 
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

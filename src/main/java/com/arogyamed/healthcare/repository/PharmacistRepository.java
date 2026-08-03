@@ -1,6 +1,7 @@
 package com.arogyamed.healthcare.repository;
 
 import com.arogyamed.healthcare.model.Pharmacist;
+import com.arogyamed.healthcare.model.Prescription;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -26,4 +27,5 @@ public interface PharmacistRepository extends JpaRepository<Pharmacist, Long> {
     List<Pharmacist> findByUser_EmailContainingIgnoreCase(String email);
 
     List<Pharmacist> findByUser_PhoneNumberContaining(String phoneNumber);
+    
 }

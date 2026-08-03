@@ -19,4 +19,6 @@ public class UserResponseDTO {
     private Role role;
 
     private boolean verified;
+
+    private String profileImageUrl;
 }

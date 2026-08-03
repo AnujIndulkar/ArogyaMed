@@ -35,6 +35,9 @@ public class Medicine {
 
     private Integer stockQuantity;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @ManyToOne
     @JoinColumn(name = "company_id")
     private Company company;

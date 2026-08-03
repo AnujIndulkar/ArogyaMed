@@ -6,6 +6,7 @@ import com.arogyamed.healthcare.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import com.arogyamed.healthcare.model.Role;
 
 import java.util.List;
@@ -65,6 +66,13 @@ public class UserController {
     public ResponseEntity<List<UserResponseDTO>> searchByVerified(@RequestParam boolean verified) {
 
         return ResponseEntity.ok(userService.searchByVerified(verified));
+    }
+
+    // UPLOAD PROFILE PICTURE
+    @PostMapping(value = "/{id}/profile-picture", consumes = "multipart/form-data")
+    public UserResponseDTO uploadProfilePicture(@PathVariable Long id, @RequestPart("file") MultipartFile file) {
+
+        return userService.uploadProfilePicture(id, file);
     }
 
     // DELETE USER

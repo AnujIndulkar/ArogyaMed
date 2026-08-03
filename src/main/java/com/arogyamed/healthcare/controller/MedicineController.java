@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -86,5 +87,11 @@ public class MedicineController {
     public ResponseEntity<List<MedicineResponseDTO>> searchLowStockMedicines(@RequestParam Integer stockQuantity) {
 
         return ResponseEntity.ok(medicineService.searchLowStockMedicines(stockQuantity));
+    }
+
+    @PostMapping(value = "/{id}/image", consumes = "multipart/form-data")
+    public MedicineResponseDTO uploadMedicineImage(@PathVariable Long id, @RequestPart("file") MultipartFile file) {
+
+        return medicineService.uploadMedicineImage(id, file);
     }
 }

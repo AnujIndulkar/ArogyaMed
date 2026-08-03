@@ -31,4 +31,6 @@ public class MedicineResponseDTO {
     private LocalDate expiryDate;
 
     private Integer stockQuantity;
+
+    private String imageUrl;
 }

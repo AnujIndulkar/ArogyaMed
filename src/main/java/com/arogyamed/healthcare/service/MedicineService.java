@@ -2,6 +2,7 @@ package com.arogyamed.healthcare.service;
 
 import com.arogyamed.healthcare.dto.MedicineRequestDTO;
 import com.arogyamed.healthcare.dto.MedicineResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,4 +30,6 @@ public interface MedicineService {
     List<MedicineResponseDTO> searchByExpiryDate(LocalDate expiryDate);
 
     List<MedicineResponseDTO> searchLowStockMedicines(Integer stockQuantity);
+
+    MedicineResponseDTO uploadMedicineImage(Long id, MultipartFile file);
 }

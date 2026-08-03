@@ -31,4 +31,6 @@ public interface PrescriptionRepository extends JpaRepository<Prescription, Long
 
     // Search by Notes
     List<Prescription> findByNotesContainingIgnoreCase(String notes);
+
+    List<Prescription> findByPatient_Id(Long patientId);
 }

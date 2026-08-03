@@ -2,9 +2,11 @@ package com.arogyamed.healthcare.controller;
 
 import com.arogyamed.healthcare.dto.PrescriptionRequestDTO;
 import com.arogyamed.healthcare.dto.PrescriptionResponseDTO;
+import com.arogyamed.healthcare.model.PrescriptionStatus;
 import com.arogyamed.healthcare.service.PrescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -84,5 +86,30 @@ public class PrescriptionController {
     public List<PrescriptionResponseDTO> searchByNotes(@RequestParam String notes) {
 
         return prescriptionService.searchByNotes(notes);
+    }
+
+    @PostMapping(value = "/upload", consumes = "multipart/form-data")
+    public PrescriptionResponseDTO uploadPrescription(
+            @RequestParam Long patientId,
+            @RequestParam(required = false) String doctorName,
+            @RequestParam(required = false) String clinicName,
+            @RequestParam(required = false) String notes,
+            @RequestPart("file") MultipartFile file) {
+
+        return prescriptionService.uploadPrescription(patientId, doctorName, clinicName, notes, file);
+    }
+
+    @PutMapping("/{id}/status")
+    public PrescriptionResponseDTO updateStatus(
+            @PathVariable Long id,
+            @RequestParam PrescriptionStatus status,
+            @RequestParam(required = false) String rejectionReason) {
+
+        return prescriptionService.updateStatus(id, status, rejectionReason);
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public List<PrescriptionResponseDTO> getByPatientId(@PathVariable Long patientId) {
+        return prescriptionService.getByPatientId(patientId);
     }
 }

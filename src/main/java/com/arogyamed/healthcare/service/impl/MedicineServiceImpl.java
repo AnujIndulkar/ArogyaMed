@@ -10,6 +10,15 @@ import com.arogyamed.healthcare.service.MedicineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +28,9 @@ public class MedicineServiceImpl implements MedicineService {
 
     @Autowired
     private MedicineRepository medicineRepository;
+
+    @Value("${media.upload.path}")
+    private String mediaUploadPath;
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -145,5 +157,44 @@ public class MedicineServiceImpl implements MedicineService {
         return medicines.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public MedicineResponseDTO uploadMedicineImage(Long id, MultipartFile file) {
+
+        Medicine medicine = medicineRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("Medicine not found"));
+
+        try {
+
+            String originalFileName = file.getOriginalFilename();
+
+            String extension = "";
+
+            if (originalFileName != null && originalFileName.contains(".")) {
+                extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            }
+
+            String storedFileName = UUID.randomUUID() + extension;
+
+            Path directoryPath = Paths.get(mediaUploadPath, "medicine-images");
+
+            if (!Files.exists(directoryPath)) {
+                Files.createDirectories(directoryPath);
+            }
+
+            Path targetPath = directoryPath.resolve(storedFileName);
+
+            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+            medicine.setImageUrl("/files/medicine-images/" + storedFileName);
+
+            Medicine updatedMedicine = medicineRepository.save(medicine);
+
+            return mapToDTO(updatedMedicine);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload medicine image.", e);
+        }
     }
 }
