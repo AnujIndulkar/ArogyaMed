@@ -20,8 +20,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Maven
-        run: mvn -B clean package -DskipTests
+      - name: Run tests
+        run: ./mvnw -B test
+
+      - name: Build application
+        run: ./mvnw -B clean package -DskipTests
 
       - name: Build Docker image
         run: docker build -t arogyamed-backend:latest .
