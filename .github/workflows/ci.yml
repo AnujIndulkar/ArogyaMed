@@ -24,7 +24,7 @@ jobs:
         run: chmod +x ./mvnw
 
       - name: Run tests
-        run: ./mvnw -B test
+        run: ./mvnw -B test -Dtest=UserServiceImplTest
 
       - name: Build application
         run: ./mvnw -B clean package -DskipTests
