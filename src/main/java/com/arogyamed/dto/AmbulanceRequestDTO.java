@@ -9,6 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 public class AmbulanceRequestDTO {
 
+    private Long userId;
+
     private String ambulanceNumber;
 
     private String driverName;
@@ -20,5 +22,11 @@ public class AmbulanceRequestDTO {
     private AmbulanceStatus status;
 
     private boolean available;
+
+    private String registrationNumber;
+
+    private String registrationCertificate;
+
+    private String insuranceDocument;
 
 }

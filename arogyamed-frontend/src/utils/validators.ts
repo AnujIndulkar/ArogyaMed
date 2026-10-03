@@ -12,13 +12,15 @@ export const registerSchema = z.object({
   email: z.string().min(1, "Email is required").email("Enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   phoneNumber: z.string().regex(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
-  role: z.enum([
+    role: z.enum([
     "PATIENT",
     "DOCTOR",
     "PHARMACIST",
     "WHOLESALER",
     "COMPANY",
     "DELIVERY_PARTNER",
+    "QUALITY_INSPECTOR",
+    "AMBULANCE_PROVIDER",
     "ADMIN",
   ]),
 });

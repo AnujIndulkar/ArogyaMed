@@ -13,7 +13,11 @@ public interface AmbulanceService {
 
     AmbulanceResponseDTO getAmbulanceById(Long id);
 
+    AmbulanceResponseDTO getAmbulanceByUserId(Long userId);
+
     AmbulanceResponseDTO updateAmbulance(Long id, AmbulanceRequestDTO request);
+
+    AmbulanceResponseDTO updateAmbulanceStatus(Long id, AmbulanceStatus status, boolean available);
 
     List<AmbulanceResponseDTO> getAllAmbulances();
 

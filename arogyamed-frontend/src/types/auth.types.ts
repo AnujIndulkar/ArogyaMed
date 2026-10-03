@@ -5,6 +5,8 @@ export type Role =
   | "WHOLESALER"
   | "COMPANY"
   | "DELIVERY_PARTNER"
+  | "QUALITY_INSPECTOR"
+  | "AMBULANCE_PROVIDER"
   | "ADMIN";
 
 export interface LoginRequest {
@@ -41,4 +43,5 @@ export interface AuthUser {
   fullName: string;
   email: string;
   role: Role;
+  profileImageUrl?: string | null;
 }

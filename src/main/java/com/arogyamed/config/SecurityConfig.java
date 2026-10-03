@@ -23,7 +23,6 @@ public class SecurityConfig {
         this.corsConfigurationSource = corsConfigurationSource;
     }
 
-    // Security Filter Chain
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -35,7 +34,6 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // PUBLIC APIs (for testing now)
                         .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/api/patients/**").permitAll()
                         .requestMatchers("/api/doctors/**").permitAll()
@@ -43,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/wholesalers/**").permitAll()
                         .requestMatchers("/api/companies/**").permitAll()
                         .requestMatchers("/api/delivery-partners/**").permitAll()
+                        .requestMatchers("/api/quality-inspectors/**").permitAll()
                         .requestMatchers("/api/medicines/**").permitAll()
                         .requestMatchers("/api/inventories/**").permitAll()
                         .requestMatchers("/api/prescriptions/**").permitAll()
@@ -68,21 +67,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/documents/**").permitAll()
                         .requestMatchers("/api/ai/**").permitAll()
 
-                        // ALL OTHER APIs SECURED
                         .anyRequest().permitAll()
                 )
 
-                // JWT Filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-
-    // Authentication Manager (needed for login system)
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-    
+
 }

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import com.arogyamed.model.QualityStatus;
 
 import java.time.LocalDate;
-
 import java.util.List;
 
 @RestController
@@ -56,77 +55,67 @@ public class QualityCheckController {
 
     // ================= Search =================
 
-    // Search by Medicine
     @GetMapping("/search/medicine/{medicineId}")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchByMedicine(@PathVariable Long medicineId) {
 
         return ResponseEntity.ok(qualityCheckService.searchByMedicine(medicineId));
     }
 
-    // Search by Company
     @GetMapping("/search/company/{companyId}")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchByCompany(@PathVariable Long companyId) {
 
         return ResponseEntity.ok(qualityCheckService.searchByCompany(companyId));
     }
 
-    // Search by Inspector
-    @GetMapping("/search/inspector/{adminId}")
-    public ResponseEntity<List<QualityCheckResponseDTO>> searchByInspector(@PathVariable Long adminId) {
+    // inspectorId here = QualityInspector.id, obtained via GET /api/quality-inspectors/{userId}
+    @GetMapping("/search/inspector/{inspectorId}")
+    public ResponseEntity<List<QualityCheckResponseDTO>> searchByInspector(@PathVariable Long inspectorId) {
 
-        return ResponseEntity.ok(qualityCheckService.searchByInspector(adminId));
+        return ResponseEntity.ok(qualityCheckService.searchByInspector(inspectorId));
     }
 
-    // Search by Quality Status
     @GetMapping("/search/status")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchByQualityStatus(@RequestParam QualityStatus qualityStatus) {
 
         return ResponseEntity.ok(qualityCheckService.searchByQualityStatus(qualityStatus));
     }
 
-    // Search by Batch Number
     @GetMapping("/search/batch")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchByBatchNumber(@RequestParam String batchNumber) {
 
         return ResponseEntity.ok(qualityCheckService.searchByBatchNumber(batchNumber));
     }
 
-    // Search by Inspection Date
     @GetMapping("/search/date")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchByInspectionDate(@RequestParam LocalDate inspectionDate) {
 
         return ResponseEntity.ok(qualityCheckService.searchByInspectionDate(inspectionDate));
     }
 
-    // Search by Inspection Date Range
     @GetMapping("/search/date-range")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchByInspectionDateRange(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
 
         return ResponseEntity.ok(qualityCheckService.searchByInspectionDate(startDate, endDate));
     }
 
-    // Search by Packaging Verification
     @GetMapping("/search/packaging")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchByPackagingVerified(@RequestParam boolean packagingVerified) {
 
         return ResponseEntity.ok(qualityCheckService.searchByPackagingVerified(packagingVerified));
     }
 
-    // Search by Seal Verification
     @GetMapping("/search/seal")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchBySealVerified(@RequestParam boolean sealVerified) {
 
         return ResponseEntity.ok(qualityCheckService.searchBySealVerified(sealVerified));
     }
 
-    // Search by Temperature Verification
     @GetMapping("/search/temperature")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchByTemperatureVerified(@RequestParam boolean temperatureVerified) {
 
         return ResponseEntity.ok(qualityCheckService.searchByTemperatureVerified(temperatureVerified));
     }
 
-    // Search by Expiry Verification
     @GetMapping("/search/expiry")
     public ResponseEntity<List<QualityCheckResponseDTO>> searchByExpiryVerified(@RequestParam boolean expiryVerified) {
 

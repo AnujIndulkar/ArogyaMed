@@ -18,6 +18,8 @@ export type DocumentModuleType =
   | "COMPANY"
   | "WHOLESALER"
   | "DELIVERY_PARTNER"
+  | "QUALITY_INSPECTOR"
+  | "AMBULANCE_PROVIDER"
   | "PATIENT"
   | "KYC"
   | "OTHER";
@@ -73,5 +75,9 @@ export const documentService = {
     });
 
     return response.data;
+  },
+
+  remove: async (documentId: number): Promise<void> => {
+    await axiosInstance.delete(`/documents/${documentId}`);
   },
 };

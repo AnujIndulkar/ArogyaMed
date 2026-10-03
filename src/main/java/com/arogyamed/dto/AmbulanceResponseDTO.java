@@ -11,6 +11,8 @@ public class AmbulanceResponseDTO {
 
     private Long id;
 
+    private Long userId;
+
     private String ambulanceNumber;
 
     private String driverName;
@@ -22,5 +24,9 @@ public class AmbulanceResponseDTO {
     private AmbulanceStatus status;
 
     private boolean available;
+
+    private String registrationNumber;
+
+    private Boolean verified;
 
 }

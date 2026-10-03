@@ -179,6 +179,66 @@ export const REGISTRATION_CONFIG: Record<Role, RoleRegistrationConfig> = {
     ],
   },
 
+    QUALITY_INSPECTOR: {
+    role: "QUALITY_INSPECTOR",
+    title: "Quality Inspector",
+    subtitle: "Inspect medicine batches and verify quality before dispatch",
+    profileEndpoint: "/quality-inspectors",
+    isVerificationGated: true,
+    fields: [
+      { name: "qualification", label: "Qualification", type: "text", required: true, placeholder: "e.g. B.Pharm, M.Pharm" },
+      { name: "licenseNumber", label: "Inspector license / registration number", type: "text", required: true },
+      { name: "yearsOfExperience", label: "Years of experience", type: "number", required: true },
+    ],
+    requiredDocuments: [
+      {
+        documentType: "OTHER",
+        label: "Inspector license / certification",
+        description: "Your quality inspection certification or professional registration",
+        reuseFieldAsNumber: "licenseNumber",
+      },
+      {
+        documentType: "AADHAAR",
+        label: "Aadhaar card",
+        description: "Government-issued identity proof",
+        numberLabel: "Last 4 digits of Aadhaar",
+        numberMaxLength: 4,
+      },
+    ],
+  },
+
+  AMBULANCE_PROVIDER: {
+    role: "AMBULANCE_PROVIDER",
+    title: "Ambulance Provider",
+    subtitle: "Respond to emergency requests and manage ambulance bookings",
+    profileEndpoint: "/ambulances",
+    isVerificationGated: true,
+    fields: [
+      { name: "ambulanceNumber", label: "Ambulance number", type: "text", required: true, placeholder: "e.g. AMB-1042" },
+      { name: "driverName", label: "Driver name", type: "text", required: true },
+      { name: "driverPhone", label: "Driver phone number", type: "tel", required: true },
+      { name: "registrationNumber", label: "Vehicle registration (RC) number", type: "text", required: true },
+      { name: "currentLocation", label: "Base location", type: "text", required: true, placeholder: "e.g. Andheri, Mumbai" },
+    ],
+    requiredDocuments: [
+      {
+        documentType: "DRIVING_LICENSE",
+        label: "Driving license",
+      },
+      {
+        documentType: "OTHER",
+        label: "Vehicle registration certificate (RC)",
+        reuseFieldAsNumber: "registrationNumber",
+      },
+      {
+        documentType: "AADHAAR",
+        label: "Aadhaar card",
+        numberLabel: "Last 4 digits of Aadhaar",
+        numberMaxLength: 4,
+      },
+    ],
+  },
+
   ADMIN: {
     role: "ADMIN",
     title: "Admin",
@@ -188,4 +248,6 @@ export const REGISTRATION_CONFIG: Record<Role, RoleRegistrationConfig> = {
     fields: [],
     requiredDocuments: [],
   },
+
+
 };

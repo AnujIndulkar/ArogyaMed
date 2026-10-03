@@ -75,6 +75,13 @@ public class UserController {
         return userService.uploadProfilePicture(id, file);
     }
 
+    // REMOVE PROFILE PICTURE
+    @DeleteMapping("/{id}/profile-picture")
+    public UserResponseDTO deleteProfilePicture(@PathVariable Long id) {
+
+        return userService.deleteProfilePicture(id);
+    }
+
     // DELETE USER
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id) {

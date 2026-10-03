@@ -10,6 +10,7 @@ import {
     Warehouse,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/ArogyaMed_logo.png";
 
 const ROLE_CARDS: { role: Role; icon: typeof HeartPulse; description: string }[] = [
   { role: "PATIENT", icon: HeartPulse, description: "Book doctors, order medicine, track your health" },
@@ -25,9 +26,11 @@ export default function RoleSelect() {
     <div className="min-h-screen bg-surface flex flex-col items-center justify-center p-6">
       <div className="max-w-3xl w-full">
         <div className="text-center mb-10">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-primary flex items-center justify-center text-white font-display font-bold mx-auto mb-4">
-            A
-          </div>
+          <img
+            src={logo}
+            alt="ArogyaMed logo"
+            className="w-11 h-11 rounded-2xl object-cover mx-auto mb-4"
+          />
           <h1 className="font-display text-3xl font-bold text-ink-900">Join ArogyaMed</h1>
           <p className="text-ink-500 mt-2">Choose how you'll be using the platform</p>
         </div>

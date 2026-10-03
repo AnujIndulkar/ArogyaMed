@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Activity, ShieldCheck, Truck } from "lucide-react";
+import logo from "@/assets/ArogyaMed_logo.png";
 
 export function AuthLayout({
   children,
@@ -20,9 +21,7 @@ export function AuthLayout({
 
         <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center font-display font-bold">
-              A
-            </div>
+            <img src={logo} alt="ArogyaMed logo" className="w-9 h-9 rounded-xl object-cover" />
             <span className="font-display font-bold text-lg">ArogyaMed</span>
           </div>
 
@@ -79,9 +78,7 @@ export function AuthLayout({
           className="w-full max-w-sm"
         >
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center text-white font-display font-bold">
-              A
-            </div>
+            <img src={logo} alt="ArogyaMed logo" className="w-9 h-9 rounded-xl object-cover" />
             <span className="font-display font-bold text-lg text-ink-900">ArogyaMed</span>
           </div>
 

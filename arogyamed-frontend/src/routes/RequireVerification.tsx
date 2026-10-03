@@ -5,7 +5,15 @@ import { useQuery } from "@tanstack/react-query";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 // Roles that must complete document verification before accessing their dashboard
-const GATED_ROLES: Role[] = ["DOCTOR", "PHARMACIST", "WHOLESALER", "COMPANY", "DELIVERY_PARTNER"];
+const GATED_ROLES: Role[] = [
+  "DOCTOR",
+  "PHARMACIST",
+  "WHOLESALER",
+  "COMPANY",
+  "DELIVERY_PARTNER",
+  "QUALITY_INSPECTOR",
+  "AMBULANCE_PROVIDER",
+];
 
 export function RequireVerification() {
   const { user } = useAuth();

@@ -7,5 +7,7 @@ public enum Role {
     WHOLESALER,
     COMPANY,
     DELIVERY_PARTNER,
+    QUALITY_INSPECTOR,
+    AMBULANCE_PROVIDER,
     ADMIN
 }

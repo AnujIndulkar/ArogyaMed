@@ -4,6 +4,7 @@ import { ChevronsLeft, ChevronsRight, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { NAV_ITEMS } from "@/constants/navigation";
 import { ROLE_LABEL } from "@/constants/roles";
+import logo from "@/assets/ArogyaMed_logo.png";
 
 export function Sidebar() {
   const { user, logout } = useAuth();
@@ -20,9 +21,11 @@ export function Sidebar() {
       }`}
     >
       <div className="flex items-center gap-2.5 px-5 h-16 border-b border-surface-border">
-        <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-primary flex items-center justify-center text-white font-display font-bold">
-          A
-        </div>
+        <img
+          src={logo}
+          alt="ArogyaMed logo"
+          className="w-9 h-9 shrink-0 rounded-xl object-cover"
+        />
         {!collapsed && (
           <span className="font-display font-bold text-ink-900 text-lg truncate">
             ArogyaMed

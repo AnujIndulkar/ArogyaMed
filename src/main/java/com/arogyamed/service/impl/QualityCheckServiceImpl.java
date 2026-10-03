@@ -2,21 +2,20 @@ package com.arogyamed.service.impl;
 
 import com.arogyamed.dto.QualityCheckRequestDTO;
 import com.arogyamed.dto.QualityCheckResponseDTO;
-import com.arogyamed.model.Admin;
 import com.arogyamed.model.Company;
 import com.arogyamed.model.Medicine;
 import com.arogyamed.model.QualityCheck;
-import com.arogyamed.repository.AdminRepository;
+import com.arogyamed.model.QualityInspector;
 import com.arogyamed.repository.CompanyRepository;
 import com.arogyamed.repository.MedicineRepository;
 import com.arogyamed.repository.QualityCheckRepository;
+import com.arogyamed.repository.QualityInspectorRepository;
 import com.arogyamed.service.QualityCheckService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.arogyamed.model.QualityStatus;
 
 import java.time.LocalDate;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,24 +26,24 @@ public class QualityCheckServiceImpl implements QualityCheckService {
     private final QualityCheckRepository qualityCheckRepository;
     private final MedicineRepository medicineRepository;
     private final CompanyRepository companyRepository;
-    private final AdminRepository adminRepository;
+    private final QualityInspectorRepository qualityInspectorRepository;
 
     @Override
     public QualityCheckResponseDTO createQualityCheck(QualityCheckRequestDTO requestDTO) {
 
         Medicine medicine = medicineRepository.findById(requestDTO.getMedicineId()).orElseThrow(() ->
-                        new RuntimeException("Medicine not found"));
+                new RuntimeException("Medicine not found"));
 
         Company company = companyRepository.findById(requestDTO.getCompanyId()).orElseThrow(() ->
-                        new RuntimeException("Company not found"));
+                new RuntimeException("Company not found"));
 
-        Admin admin = adminRepository.findById(requestDTO.getAdminId()).orElseThrow(() ->
-                        new RuntimeException("Admin not found"));
+        QualityInspector inspector = qualityInspectorRepository.findById(requestDTO.getInspectorId()).orElseThrow(() ->
+                new RuntimeException("Quality Inspector not found"));
 
         QualityCheck qualityCheck = QualityCheck.builder()
                 .medicine(medicine)
                 .company(company)
-                .inspector(admin)
+                .inspector(inspector)
                 .batchNumber(requestDTO.getBatchNumber())
                 .packagingVerified(requestDTO.isPackagingVerified())
                 .sealVerified(requestDTO.isSealVerified())
@@ -52,11 +51,11 @@ public class QualityCheckServiceImpl implements QualityCheckService {
                 .expiryVerified(requestDTO.isExpiryVerified())
                 .inspectorRemarks(requestDTO.getInspectorRemarks())
                 .inspectionDate(requestDTO.getInspectionDate() == null
-                                ? LocalDate.now()
-                                : requestDTO.getInspectionDate())
-                .qualityStatus(requestDTO.getQualityStatus()).qualityStatus(requestDTO.getQualityStatus() == null
-                                ? QualityStatus.PENDING
-                                : requestDTO.getQualityStatus())
+                        ? LocalDate.now()
+                        : requestDTO.getInspectionDate())
+                .qualityStatus(requestDTO.getQualityStatus() == null
+                        ? QualityStatus.PENDING
+                        : requestDTO.getQualityStatus())
                 .build();
 
         return mapToResponseDTO(qualityCheckRepository.save(qualityCheck));
@@ -66,7 +65,7 @@ public class QualityCheckServiceImpl implements QualityCheckService {
     public QualityCheckResponseDTO getQualityCheckById(Long id) {
 
         QualityCheck qualityCheck = qualityCheckRepository.findById(id).orElseThrow(() ->
-                        new RuntimeException("Quality Check not found"));
+                new RuntimeException("Quality Check not found"));
 
         return mapToResponseDTO(qualityCheck);
     }
@@ -84,20 +83,20 @@ public class QualityCheckServiceImpl implements QualityCheckService {
     public QualityCheckResponseDTO updateQualityCheck(Long id, QualityCheckRequestDTO requestDTO) {
 
         QualityCheck qualityCheck = qualityCheckRepository.findById(id).orElseThrow(() ->
-                        new RuntimeException("Quality Check not found"));
+                new RuntimeException("Quality Check not found"));
 
         Medicine medicine = medicineRepository.findById(requestDTO.getMedicineId()).orElseThrow(() ->
-                        new RuntimeException("Medicine not found"));
+                new RuntimeException("Medicine not found"));
 
         Company company = companyRepository.findById(requestDTO.getCompanyId()).orElseThrow(() ->
-                        new RuntimeException("Company not found"));
+                new RuntimeException("Company not found"));
 
-        Admin admin = adminRepository.findById(requestDTO.getAdminId()).orElseThrow(() ->
-                        new RuntimeException("Admin not found"));
+        QualityInspector inspector = qualityInspectorRepository.findById(requestDTO.getInspectorId()).orElseThrow(() ->
+                new RuntimeException("Quality Inspector not found"));
 
         qualityCheck.setMedicine(medicine);
         qualityCheck.setCompany(company);
-        qualityCheck.setInspector(admin);
+        qualityCheck.setInspector(inspector);
         qualityCheck.setBatchNumber(requestDTO.getBatchNumber());
         qualityCheck.setPackagingVerified(requestDTO.isPackagingVerified());
         qualityCheck.setSealVerified(requestDTO.isSealVerified());
@@ -114,7 +113,7 @@ public class QualityCheckServiceImpl implements QualityCheckService {
     public void deleteQualityCheck(Long id) {
 
         QualityCheck qualityCheck = qualityCheckRepository.findById(id).orElseThrow(() ->
-                        new RuntimeException("Quality Check not found"));
+                new RuntimeException("Quality Check not found"));
 
         qualityCheckRepository.delete(qualityCheck);
     }
@@ -127,8 +126,8 @@ public class QualityCheckServiceImpl implements QualityCheckService {
                 .medicineName(qualityCheck.getMedicine().getMedicineName())
                 .companyId(qualityCheck.getCompany().getId())
                 .companyName(qualityCheck.getCompany().getCompanyName())
-                .inspectorId(qualityCheck.getInspector().getId())
-                .inspectorName(qualityCheck.getInspector().getUser().getFullName())
+                .inspectorId(qualityCheck.getInspector() != null ? qualityCheck.getInspector().getId() : null)
+                .inspectorName(qualityCheck.getInspector() != null ? qualityCheck.getInspector().getUser().getFullName() : null)
                 .batchNumber(qualityCheck.getBatchNumber())
                 .packagingVerified(qualityCheck.isPackagingVerified())
                 .sealVerified(qualityCheck.isSealVerified())
@@ -161,12 +160,12 @@ public class QualityCheckServiceImpl implements QualityCheckService {
     }
 
     @Override
-    public List<QualityCheckResponseDTO> searchByInspector(Long adminId) {
+    public List<QualityCheckResponseDTO> searchByInspector(Long inspectorId) {
 
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+        QualityInspector inspector = qualityInspectorRepository.findById(inspectorId)
+                .orElseThrow(() -> new RuntimeException("Quality Inspector not found"));
 
-        return mapToResponseDTOList(qualityCheckRepository.findByInspector(admin));
+        return mapToResponseDTOList(qualityCheckRepository.findByInspector(inspector));
     }
 
     @Override

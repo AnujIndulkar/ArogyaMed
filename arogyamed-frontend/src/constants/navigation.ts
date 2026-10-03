@@ -86,6 +86,20 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
     { label: "My Documents", path: "/documents", icon: FileCheck },
     ...COMMON_ITEMS,
   ],
+    QUALITY_INSPECTOR: [
+    { label: "Dashboard", path: "/quality-inspector/dashboard", icon: LayoutDashboard },
+    { label: "Pending Inspections", path: "/quality-inspector/inspections", icon: ClipboardList },
+    { label: "Batches", path: "/quality-inspector/batches", icon: Package },
+    { label: "My Documents", path: "/documents", icon: FileCheck },
+    ...COMMON_ITEMS,
+  ],
+  AMBULANCE_PROVIDER: [
+    { label: "Dashboard", path: "/ambulance-provider/dashboard", icon: LayoutDashboard },
+    { label: "Requests", path: "/ambulance-provider/requests", icon: Siren },
+    { label: "Bookings", path: "/ambulance-provider/bookings", icon: Ambulance },
+    { label: "My Documents", path: "/documents", icon: FileCheck },
+    ...COMMON_ITEMS,
+  ],
   ADMIN: [
     { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
     { label: "Users", path: "/admin/users", icon: Users },

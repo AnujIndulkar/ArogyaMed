@@ -23,6 +23,8 @@ const ROLE_SLUG_MAP: Record<string, Role> = {
   wholesaler: "WHOLESALER",
   company: "COMPANY",
   "delivery-partner": "DELIVERY_PARTNER",
+  "quality-inspector": "QUALITY_INSPECTOR",
+  "ambulance-provider": "AMBULANCE_PROVIDER",
 };
 
 export default function RoleRegister() {

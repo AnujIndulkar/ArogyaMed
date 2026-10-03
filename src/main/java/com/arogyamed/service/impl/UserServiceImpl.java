@@ -168,6 +168,32 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
+    @Override
+    public UserResponseDTO deleteProfilePicture(Long userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new RuntimeException("User not found with ID : " + userId));
+
+        String existingUrl = user.getProfileImageUrl();
+
+        if (existingUrl != null && existingUrl.startsWith("/files/profile-pictures/")) {
+            try {
+                String storedFileName = existingUrl.substring("/files/profile-pictures/".length());
+                Path filePath = Paths.get(mediaUploadPath, "profile-pictures", storedFileName);
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                // Non-fatal: still clear the reference even if the file was already missing
+            }
+        }
+
+        user.setProfileImageUrl(null);
+
+        User updatedUser = userRepository.save(user);
+
+        return mapToResponse(updatedUser);
+    }
+
     // MAPPER METHOD
     private UserResponseDTO mapToResponse(User user) {
         UserResponseDTO dto = new UserResponseDTO();

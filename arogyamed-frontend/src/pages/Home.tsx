@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import logo from "@/assets/ArogyaMed_logo.png";
 import {
   Search,
   MapPin,
@@ -76,9 +77,7 @@ export default function Home() {
       {/* Navbar */}
       <header className="glass sticky top-0 z-30 h-16 flex items-center justify-between px-6">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center text-white font-display font-bold text-sm">
-            A
-          </div>
+          <img src={logo} alt="ArogyaMed logo" className="w-8 h-8 rounded-lg object-cover" />
           <span className="font-display font-bold text-ink-900">ArogyaMed</span>
         </div>
 
@@ -95,45 +94,126 @@ export default function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-mesh" />
-        <div className="max-w-7xl mx-auto px-6 pt-20 pb-16 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl"
-          >
-            <span className="inline-flex items-center gap-1.5 bg-primary-50 text-primary-700 text-xs font-medium px-3 py-1.5 rounded-full mb-5">
-              <Ambulance size={13} /> Emergency response in under 12 minutes, average
-            </span>
+        <div className="max-w-7xl mx-auto px-6 pt-14 pb-16 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="inline-flex items-center gap-1.5 bg-primary-50 text-primary-700 text-xs font-medium px-3 py-1.5 rounded-full mb-5">
+                <Ambulance size={13} /> Emergency response in under 12 minutes, average
+              </span>
 
-            <h1 className="font-display text-5xl font-bold text-ink-900 leading-[1.1]">
-              Your medicine cabinet, doctor, and ambulance — one tap away.
-            </h1>
+              <h1 className="font-display text-5xl font-bold text-ink-900 leading-[1.1]">
+                Your medicine cabinet, doctor, and ambulance — one tap away.
+              </h1>
 
-            <p className="text-ink-500 mt-5 text-lg max-w-lg">
-              ArogyaMed connects patients, doctors, pharmacies, and emergency
-              response into a single, verified healthcare platform.
-            </p>
+              <p className="text-ink-500 mt-5 text-lg max-w-lg">
+                ArogyaMed connects patients, doctors, pharmacies, and emergency
+                response into a single, verified healthcare platform.
+              </p>
 
-            {/* Search medicine */}
-            <div className="mt-8 flex items-center gap-2 bg-white rounded-2xl p-2 shadow-soft max-w-lg">
-              <div className="flex items-center gap-2 flex-1 px-3">
-                <Search size={18} className="text-ink-300" />
-                <input
-                  placeholder="Search medicine, e.g. Paracetamol"
-                  className="w-full py-2.5 outline-none text-sm placeholder:text-ink-300"
-                />
+              {/* Search medicine */}
+              <div className="mt-8 flex items-center gap-2 bg-white rounded-2xl p-2 shadow-soft max-w-lg">
+                <div className="flex items-center gap-2 flex-1 px-3">
+                  <Search size={18} className="text-ink-300" />
+                  <input
+                    placeholder="Search medicine, e.g. Paracetamol"
+                    className="w-full py-2.5 outline-none text-sm placeholder:text-ink-300"
+                  />
+                </div>
+                <Link to="/register" className="btn-primary text-sm shrink-0">
+                  Search
+                </Link>
               </div>
-              <Link to="/register" className="btn-primary text-sm shrink-0">
-                Search
-              </Link>
-            </div>
 
-            <div className="mt-4 flex items-center gap-1.5 text-sm text-ink-500">
-              <MapPin size={14} />
-              <span>Showing pharmacies near your location</span>
-            </div>
-          </motion.div>
+              <div className="mt-4 flex items-center gap-1.5 text-sm text-ink-500">
+                <MapPin size={14} />
+                <span>Showing pharmacies near your location</span>
+              </div>
+            </motion.div>
+
+            {/* Illustration */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="hidden lg:block relative"
+            >
+              <div className="relative rounded-[2rem] bg-white border border-surface-border shadow-soft p-5">
+                {/* Panel header */}
+                <div className="flex items-center justify-between mb-4 px-1">
+                  <div>
+                    <p className="text-sm font-display font-semibold text-ink-900">Live tracking</p>
+                    <p className="text-[11px] text-ink-500">Order #AM-4521</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-accent-600">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-500 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-500" />
+                    </span>
+                    Live
+                  </span>
+                </div>
+
+                {/* Map area */}
+                <div
+                  className="relative rounded-2xl overflow-hidden"
+                  style={{
+                    backgroundColor: "#F8F9FC",
+                    backgroundImage: "radial-gradient(circle, #E4E0FD 1.5px, transparent 1.5px)",
+                    backgroundSize: "18px 18px",
+                  }}
+                >
+                  <svg viewBox="0 0 400 300" className="w-full h-auto block">
+                    <path
+                      d="M 50 60 C 130 20, 170 140, 210 160 C 250 180, 290 240, 350 270"
+                      fill="none"
+                      stroke="#C9C1FB"
+                      strokeWidth="3"
+                      strokeDasharray="2 10"
+                      strokeLinecap="round"
+                    />
+
+                    <text x="50" y="38" textAnchor="middle" className="fill-ink-500" fontSize="11">
+                      Pharmacy
+                    </text>
+                    <circle cx="50" cy="60" r="7" fill="#6D5EF7" />
+                    <circle cx="50" cy="60" r="13" fill="none" stroke="#6D5EF7" strokeOpacity="0.25" strokeWidth="6" />
+
+                    <circle cx="350" cy="270" r="7" fill="#14152B" />
+                    <text x="350" y="292" textAnchor="middle" className="fill-ink-500" fontSize="11">
+                      You
+                    </text>
+
+                    <motion.circle
+                      r="8"
+                      fill="#FF6B6B"
+                      animate={{
+                        cx: [50, 130, 210, 280, 350],
+                        cy: [60, 35, 160, 220, 270],
+                      }}
+                      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  </svg>
+                </div>
+
+                {/* ETA card, overlapping the map */}
+                <div className="relative -mt-7 mx-1">
+                  <div className="bg-white rounded-2xl shadow-soft border border-surface-border px-4 py-3 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-accent-50 text-accent-600 flex items-center justify-center shrink-0">
+                      <Ambulance size={18} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-ink-900">Ambulance arriving in 6 min</p>
+                      <p className="text-[11px] text-ink-500 truncate">Suresh K. · MH-04-AB-1234</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 

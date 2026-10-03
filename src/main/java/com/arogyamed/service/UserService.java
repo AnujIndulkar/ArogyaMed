@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface UserService {
 
-    // ================= CRUD =================
-
     UserResponseDTO registerUser(UserRequestDTO request);
 
     UserResponseDTO getUserById(Long id);
@@ -18,8 +16,6 @@ public interface UserService {
     List<UserResponseDTO> getAllUsers();
 
     void deleteUser(Long id);
-
-    // ================= Search =================
 
     List<UserResponseDTO> searchByFullName(String fullName);
 
@@ -31,7 +27,7 @@ public interface UserService {
 
     List<UserResponseDTO> searchByVerified(boolean verified);
 
-    // ================= Profile Picture =================
-
     UserResponseDTO uploadProfilePicture(Long userId, MultipartFile file);
+
+    UserResponseDTO deleteProfilePicture(Long userId);
 }

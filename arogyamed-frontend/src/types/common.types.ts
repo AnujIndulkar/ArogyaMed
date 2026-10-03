@@ -100,11 +100,20 @@ export interface Review {
 
 export interface Prescription {
   id: number;
+  doctorId?: number;
+  doctorName?: string;
   patientId: number;
-  doctorId: number;
-  medicineDetails: string;
+  patientName?: string;
+  diagnosis?: string;
+  medicines?: string;
+  dosageInstructions?: string;
+  prescriptionDate?: string;
+  notes?: string;
+  prescriptionImageUrl?: string;
+  clinicName?: string;
   status: "PENDING" | "VERIFIED" | "REJECTED";
-  issuedAt?: string;
+  rejectionReason?: string;
+  uploadedAt?: string;
 }
 
 export interface MedicalRecord {
@@ -126,8 +135,11 @@ export interface Inventory {
 
 export interface Medicine {
   id: number;
+  companyId?: number;
+  companyName?: string;
   medicineName: string;
   category: string;
+  description?: string;
   price: number;
   stockQuantity: number;
   expiryDate: string;

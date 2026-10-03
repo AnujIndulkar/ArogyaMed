@@ -7,6 +7,8 @@ export const ROLE_DASHBOARD_PATH: Record<Role, string> = {
   WHOLESALER: "/wholesaler/dashboard",
   COMPANY: "/company/dashboard",
   DELIVERY_PARTNER: "/delivery/dashboard",
+  QUALITY_INSPECTOR: "/quality-inspector/dashboard",
+  AMBULANCE_PROVIDER: "/ambulance-provider/dashboard",
   ADMIN: "/admin/dashboard",
 };
 
@@ -17,6 +19,8 @@ export const ROLE_LABEL: Record<Role, string> = {
   WHOLESALER: "Wholesaler",
   COMPANY: "Company",
   DELIVERY_PARTNER: "Delivery Partner",
+  QUALITY_INSPECTOR: "Quality Inspector",
+  AMBULANCE_PROVIDER: "Ambulance Provider",
   ADMIN: "Admin",
 };
 
@@ -27,5 +31,7 @@ export const ROLE_OPTIONS: Role[] = [
   "WHOLESALER",
   "COMPANY",
   "DELIVERY_PARTNER",
+  "QUALITY_INSPECTOR",
+  "AMBULANCE_PROVIDER",
   "ADMIN",
 ];

@@ -16,7 +16,7 @@ public class QualityCheckRequestDTO {
 
     private Long companyId;
 
-    private Long adminId;
+    private Long inspectorId;
 
     private String batchNumber;
 

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Pill, Plus } from "lucide-react";
+import { Pill, Plus, FileUp } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/common/Card";
 import { Button } from "@/components/common/Button";
@@ -10,11 +12,14 @@ import { DataTable, type Column } from "@/components/common/DataTable";
 import { Badge } from "@/components/common/Badge";
 import { useCrud } from "@/hooks/useCrud";
 import { medicineService } from "@/services/domainServices";
+import axiosInstance from "@/api/axiosInstance";
+import { getMediaUrl } from "@/utils/media";
 import type { Medicine } from "@/types/common.types";
 
 interface MedicineForm {
   medicineName: string;
   category: string;
+  description: string;
   price: number;
   stockQuantity: number;
   batchNumber: string;
@@ -22,21 +27,63 @@ interface MedicineForm {
   expiryDate: string;
 }
 
+async function uploadMedicineImage(id: number, file: File): Promise<Medicine> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await axiosInstance.post<Medicine>(`/medicines/${id}/image`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+}
+
 export default function MedicineList() {
   const { items, isLoading, create, isCreating } = useCrud<Medicine>("medicines", medicineService);
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const { register, handleSubmit, reset } = useForm<MedicineForm>();
+
+  const imageMutation = useMutation({
+    mutationFn: ({ id, file }: { id: number; file: File }) => uploadMedicineImage(id, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["medicines"] });
+    },
+    onError: () => toast.error("Medicine saved, but the image failed to upload"),
+  });
 
   const onSubmit = (values: MedicineForm) => {
     create(
       { ...values, price: Number(values.price), stockQuantity: Number(values.stockQuantity) } as Partial<Medicine>,
-      { onSuccess: () => { setOpen(false); reset(); } } as any
+      {
+        onSuccess: (created: Medicine) => {
+          if (imageFile) {
+            imageMutation.mutate({ id: created.id, file: imageFile });
+          }
+          setOpen(false);
+          setImageFile(null);
+          reset();
+        },
+      } as any
     );
   };
 
   const columns: Column<Medicine>[] = [
-    { header: "Medicine", accessor: (m) => <span className="font-medium text-ink-900">{m.medicineName}</span> },
+    {
+      header: "Medicine",
+      accessor: (m) => (
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 overflow-hidden">
+            {m.imageUrl ? (
+              <img src={getMediaUrl(m.imageUrl) ?? ""} alt={m.medicineName} className="w-full h-full object-cover" />
+            ) : (
+              <Pill size={16} className="text-primary-300" />
+            )}
+          </div>
+          <span className="font-medium text-ink-900">{m.medicineName}</span>
+        </div>
+      ),
+    },
     { header: "Category", accessor: (m) => m.category },
     { header: "Batch", accessor: (m) => <span className="font-mono text-xs">{m.batchNumber}</span> },
     { header: "Price", accessor: (m) => `₹${m.price}` },
@@ -71,8 +118,37 @@ export default function MedicineList() {
 
       <Modal open={open} onClose={() => setOpen(false)} title="Add medicine">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-ink-700">Product photo (optional)</label>
+            <label
+              htmlFor="medicine-image"
+              className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-surface-border rounded-xl py-5 text-sm text-ink-500 hover:border-primary-300 hover:text-primary-600 transition-colors cursor-pointer"
+            >
+              <FileUp size={16} />
+              {imageFile ? imageFile.name : "Choose an image"}
+            </label>
+            <input
+              id="medicine-image"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+              className="hidden"
+            />
+          </div>
+
           <Input label="Medicine name" {...register("medicineName", { required: true })} />
           <Input label="Category" {...register("category", { required: true })} />
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-ink-700">Description (optional)</label>
+            <textarea
+              rows={3}
+              placeholder="Usage, dosage instructions, key info shown to buyers..."
+              className="w-full rounded-xl border border-surface-border bg-white px-4 py-2.5 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 resize-none"
+              {...register("description")}
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <Input label="Price (₹)" type="number" step="0.01" {...register("price", { required: true })} />
             <Input label="Stock quantity" type="number" {...register("stockQuantity", { required: true })} />
@@ -82,7 +158,7 @@ export default function MedicineList() {
             <Input label="Manufacturing date" type="date" {...register("manufacturingDate", { required: true })} />
             <Input label="Expiry date" type="date" {...register("expiryDate", { required: true })} />
           </div>
-          <Button type="submit" isLoading={isCreating} className="w-full mt-1">
+          <Button type="submit" isLoading={isCreating || imageMutation.isPending} className="w-full mt-1">
             Add medicine
           </Button>
         </form>

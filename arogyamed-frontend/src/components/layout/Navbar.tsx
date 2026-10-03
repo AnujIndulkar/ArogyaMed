@@ -1,5 +1,6 @@
 import { Bell, Search } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { getMediaUrl } from "@/utils/media";
 
 export function Navbar({ title }: { title: string }) {
   const { user } = useAuth();
@@ -10,6 +11,8 @@ export function Navbar({ title }: { title: string }) {
     .slice(0, 2)
     .join("")
     .toUpperCase();
+
+  const photoSrc = getMediaUrl(user?.profileImageUrl);
 
   return (
     <header className="glass sticky top-0 z-20 h-16 flex items-center justify-between px-6 border-b border-surface-border">
@@ -29,9 +32,17 @@ export function Navbar({ title }: { title: string }) {
           <span className="absolute top-2 right-2 w-2 h-2 bg-accent-500 rounded-full" />
         </button>
 
-        <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center text-white text-xs font-semibold">
-          {initials || "U"}
-        </div>
+        {photoSrc ? (
+          <img
+            src={photoSrc}
+            alt={user?.fullName ?? "Profile"}
+            className="w-9 h-9 rounded-xl object-cover"
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center text-white text-xs font-semibold">
+            {initials || "U"}
+          </div>
+        )}
       </div>
     </header>
   );

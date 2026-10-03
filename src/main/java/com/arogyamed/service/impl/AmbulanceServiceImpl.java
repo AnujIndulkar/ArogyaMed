@@ -4,7 +4,9 @@ import com.arogyamed.dto.AmbulanceRequestDTO;
 import com.arogyamed.dto.AmbulanceResponseDTO;
 import com.arogyamed.model.Ambulance;
 import com.arogyamed.model.AmbulanceStatus;
+import com.arogyamed.model.User;
 import com.arogyamed.repository.AmbulanceRepository;
+import com.arogyamed.repository.UserRepository;
 import com.arogyamed.service.AmbulanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,10 +21,19 @@ public class AmbulanceServiceImpl implements AmbulanceService {
     @Autowired
     private AmbulanceRepository ambulanceRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public AmbulanceResponseDTO createAmbulance(AmbulanceRequestDTO request) {
 
         Ambulance ambulance = new Ambulance();
+
+        if (request.getUserId() != null) {
+            User user = userRepository.findById(request.getUserId()).orElseThrow(() ->
+                    new RuntimeException("User not found"));
+            ambulance.setUser(user);
+        }
 
         ambulance.setAmbulanceNumber(request.getAmbulanceNumber());
 
@@ -32,9 +43,15 @@ public class AmbulanceServiceImpl implements AmbulanceService {
 
         ambulance.setCurrentLocation(request.getCurrentLocation());
 
-        ambulance.setStatus(request.getStatus());
+        ambulance.setStatus(request.getStatus() == null ? AmbulanceStatus.AVAILABLE : request.getStatus());
 
         ambulance.setAvailable(request.isAvailable());
+
+        ambulance.setRegistrationNumber(request.getRegistrationNumber());
+
+        ambulance.setRegistrationCertificate(request.getRegistrationCertificate());
+
+        ambulance.setInsuranceDocument(request.getInsuranceDocument());
 
         return mapToDTO(ambulanceRepository.save(ambulance));
     }
@@ -43,6 +60,15 @@ public class AmbulanceServiceImpl implements AmbulanceService {
     public AmbulanceResponseDTO getAmbulanceById(Long id) {
 
         Ambulance ambulance = ambulanceRepository.findById(id).orElseThrow(() -> new RuntimeException("Ambulance not found"));
+
+        return mapToDTO(ambulance);
+    }
+
+    @Override
+    public AmbulanceResponseDTO getAmbulanceByUserId(Long userId) {
+
+        Ambulance ambulance = ambulanceRepository.findByUserId(userId).orElseThrow(() ->
+                new RuntimeException("Ambulance not found for this user"));
 
         return mapToDTO(ambulance);
     }
@@ -64,6 +90,21 @@ public class AmbulanceServiceImpl implements AmbulanceService {
 
         ambulance.setAvailable(request.isAvailable());
 
+        if (request.getRegistrationNumber() != null) {
+            ambulance.setRegistrationNumber(request.getRegistrationNumber());
+        }
+
+        return mapToDTO(ambulanceRepository.save(ambulance));
+    }
+
+    @Override
+    public AmbulanceResponseDTO updateAmbulanceStatus(Long id, AmbulanceStatus status, boolean available) {
+
+        Ambulance ambulance = ambulanceRepository.findById(id).orElseThrow(() -> new RuntimeException("Ambulance not found"));
+
+        ambulance.setStatus(status);
+        ambulance.setAvailable(available);
+
         return mapToDTO(ambulanceRepository.save(ambulance));
     }
 
@@ -82,6 +123,8 @@ public class AmbulanceServiceImpl implements AmbulanceService {
 
         dto.setId(ambulance.getId());
 
+        dto.setUserId(ambulance.getUser() != null ? ambulance.getUser().getId() : null);
+
         dto.setAmbulanceNumber(ambulance.getAmbulanceNumber());
 
         dto.setDriverName(ambulance.getDriverName());
@@ -93,6 +136,10 @@ public class AmbulanceServiceImpl implements AmbulanceService {
         dto.setStatus(ambulance.getStatus());
 
         dto.setAvailable(ambulance.isAvailable());
+
+        dto.setRegistrationNumber(ambulance.getRegistrationNumber());
+
+        dto.setVerified(ambulance.getVerified());
 
         return dto;
     }
