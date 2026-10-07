@@ -47,6 +47,9 @@ public class MedicineServiceImpl implements MedicineService {
         medicine.setMedicineName(request.getMedicineName());
         medicine.setCategory(request.getCategory());
         medicine.setDescription(request.getDescription());
+        medicine.setGenericName(request.getGenericName());
+        medicine.setPackSize(request.getPackSize());
+        medicine.setImageUrl(request.getImageUrl());
         medicine.setPrice(request.getPrice());
         medicine.setBatchNumber(request.getBatchNumber());
         medicine.setManufacturingDate(request.getManufacturingDate());
@@ -74,6 +77,9 @@ public class MedicineServiceImpl implements MedicineService {
         medicine.setMedicineName(request.getMedicineName());
         medicine.setCategory(request.getCategory());
         medicine.setDescription(request.getDescription());
+        medicine.setGenericName(request.getGenericName());
+        medicine.setPackSize(request.getPackSize());
+        medicine.setImageUrl(request.getImageUrl());
         medicine.setPrice(request.getPrice());
         medicine.setBatchNumber(request.getBatchNumber());
         medicine.setManufacturingDate(request.getManufacturingDate());
@@ -97,16 +103,21 @@ public class MedicineServiceImpl implements MedicineService {
         MedicineResponseDTO dto = new MedicineResponseDTO();
 
         dto.setId(medicine.getId());
-        dto.setCompanyId(medicine.getCompany().getId());
-        dto.setCompanyName(medicine.getCompany().getCompanyName());
+        if (medicine.getCompany() != null) {
+            dto.setCompanyId(medicine.getCompany().getId());
+            dto.setCompanyName(medicine.getCompany().getCompanyName());
+        }
         dto.setMedicineName(medicine.getMedicineName());
         dto.setCategory(medicine.getCategory());
+        dto.setGenericName(medicine.getGenericName());
+        dto.setPackSize(medicine.getPackSize());
         dto.setDescription(medicine.getDescription());
         dto.setPrice(medicine.getPrice());
         dto.setBatchNumber(medicine.getBatchNumber());
         dto.setManufacturingDate(medicine.getManufacturingDate());
         dto.setExpiryDate(medicine.getExpiryDate());
         dto.setStockQuantity(medicine.getStockQuantity());
+        dto.setImageUrl(medicine.getImageUrl());
 
         return dto;
     }

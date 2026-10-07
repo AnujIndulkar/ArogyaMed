@@ -3,18 +3,21 @@ package com.arogyamed.config;
 import com.arogyamed.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CorsConfigurationSource corsConfigurationSource;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
@@ -32,42 +35,40 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                // not logged in -> 401, so the frontend sends the user to /login
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/api/users/**").permitAll()
-                        .requestMatchers("/api/patients/**").permitAll()
-                        .requestMatchers("/api/doctors/**").permitAll()
-                        .requestMatchers("/api/pharmacists/**").permitAll()
-                        .requestMatchers("/api/wholesalers/**").permitAll()
-                        .requestMatchers("/api/companies/**").permitAll()
-                        .requestMatchers("/api/delivery-partners/**").permitAll()
-                        .requestMatchers("/api/quality-inspectors/**").permitAll()
-                        .requestMatchers("/api/medicines/**").permitAll()
-                        .requestMatchers("/api/inventories/**").permitAll()
-                        .requestMatchers("/api/prescriptions/**").permitAll()
-                        .requestMatchers("/api/medical-records/**").permitAll()
-                        .requestMatchers("/api/appointments/**").permitAll()
-                        .requestMatchers("/api/sos/**").permitAll()
-                        .requestMatchers("/api/ambulances/**").permitAll()
-                        .requestMatchers("/api/ambulance-bookings/**").permitAll()
-                        .requestMatchers("/api/orders/**").permitAll()
-                        .requestMatchers("/api/order-items/**").permitAll()
-                        .requestMatchers("/api/payments/**").permitAll()
-                        .requestMatchers("/api/delivery-tracking/**").permitAll()
-                        .requestMatchers("/api/notifications/**").permitAll()
-                        .requestMatchers("/api/kyc/**").permitAll()
-                        .requestMatchers("/api/reviews/**").permitAll()
-                        .requestMatchers("/api/admins/**").permitAll()
-                        .requestMatchers("/api/quality-checks/**").permitAll()
-                        .requestMatchers("/api/dashboard/**").permitAll()
-                        .requestMatchers("/api/audit-logs/**").permitAll()
-                        .requestMatchers("/api/barcodes/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/reports/**").permitAll()
-                        .requestMatchers("/api/documents/**").permitAll()
-                        .requestMatchers("/api/ai/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/error").permitAll()
 
-                        .anyRequest().permitAll()
+                        // login + register
+                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // registration steps happen BEFORE the user has a token
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/patients", "/api/doctors", "/api/pharmacists",
+                                "/api/wholesalers", "/api/companies", "/api/delivery-partners",
+                                "/api/quality-inspectors", "/api/ambulances",
+                                "/api/documents/upload").permitAll()
+
+                        // medicine images and the medicine catalog can be viewed without logging in
+                        .requestMatchers(HttpMethod.GET, "/files/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/medicines/**").permitAll()
+
+                        // admin-only areas
+                        .requestMatchers("/api/admins/**", "/api/audit-logs/**").hasRole("ADMIN")
+
+                        // only companies (and admins) may change medicines
+                        .requestMatchers(HttpMethod.POST, "/api/medicines/**").hasAnyRole("COMPANY", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/medicines/**").hasAnyRole("COMPANY", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/medicines/**").hasAnyRole("COMPANY", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/medicines/**").hasAnyRole("COMPANY", "ADMIN")
+
+                        // everything else needs a valid login
+                        .anyRequest().authenticated()
                 )
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -79,5 +80,4 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 }

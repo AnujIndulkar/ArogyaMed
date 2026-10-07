@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Pill, Plus, FileUp } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/common/Card";
@@ -15,6 +15,7 @@ import { medicineService } from "@/services/domainServices";
 import axiosInstance from "@/api/axiosInstance";
 import { getMediaUrl } from "@/utils/media";
 import type { Medicine } from "@/types/common.types";
+import { useAuth } from "@/hooks/useAuth";
 
 interface MedicineForm {
   medicineName: string;
@@ -37,8 +38,33 @@ async function uploadMedicineImage(id: number, file: File): Promise<Medicine> {
 }
 
 export default function MedicineList() {
-  const { items, isLoading, create, isCreating } = useCrud<Medicine>("medicines", medicineService);
+   const { user } = useAuth();
+  const { create, isCreating } = useCrud<Medicine>("medicines", medicineService);
   const queryClient = useQueryClient();
+
+  // this company's own record (we need its id to create medicines)
+  const { data: company } = useQuery({
+    queryKey: ["my-company", user?.userId],
+    queryFn: async () => {
+      const response = await axiosInstance.get<{ id: number; companyName: string }>(`/companies/${user?.userId}`);
+      return response.data;
+    },
+    enabled: !!user?.userId,
+    retry: false,
+  });
+
+  // only this company's medicines
+  const { data: items = [], isLoading } = useQuery({
+    queryKey: ["medicines", "company", company?.companyName],
+    queryFn: async () => {
+      const response = await axiosInstance.get<Medicine[]>("/medicines/search/company", {
+        params: { companyName: company?.companyName },
+      });
+      return response.data;
+    },
+    enabled: !!company?.companyName,
+    retry: false,
+  });
   const [open, setOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -54,7 +80,12 @@ export default function MedicineList() {
 
   const onSubmit = (values: MedicineForm) => {
     create(
-      { ...values, price: Number(values.price), stockQuantity: Number(values.stockQuantity) } as Partial<Medicine>,
+            {
+        ...values,
+        companyId: company?.id,
+        price: Number(values.price),
+        stockQuantity: Number(values.stockQuantity),
+      } as Partial<Medicine>,
       {
         onSuccess: (created: Medicine) => {
           if (imageFile) {
@@ -80,7 +111,10 @@ export default function MedicineList() {
               <Pill size={16} className="text-primary-300" />
             )}
           </div>
-          <span className="font-medium text-ink-900">{m.medicineName}</span>
+          <div className="min-w-0">
+            <span className="font-medium text-ink-900 block truncate">{m.medicineName}</span>
+            <span className="text-xs text-ink-500 block truncate">{m.packSize}</span>
+          </div>
         </div>
       ),
     },

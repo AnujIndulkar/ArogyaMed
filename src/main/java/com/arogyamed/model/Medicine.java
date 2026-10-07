@@ -23,6 +23,8 @@ public class Medicine {
 
     private String genericName;
 
+    private String packSize;
+
     private String description;
 
     private Double price;

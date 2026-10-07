@@ -20,6 +20,10 @@ public class MedicineResponseDTO {
 
     private String category;
 
+    private String genericName;
+
+    private String packSize;
+
     private String description;
 
     private Double price;

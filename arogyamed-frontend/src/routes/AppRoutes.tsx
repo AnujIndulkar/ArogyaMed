@@ -14,6 +14,7 @@ import DeliveryDashboard from "@/pages/delivery/DeliveryDashboard";
 import DoctorDashboard from "@/pages/doctor/DoctorDashboard";
 import CartPage from "@/pages/patient/CartPage";
 import MedicineCatalog from "@/pages/patient/MedicineCatalog";
+import MedicineDetail from "@/pages/patient/MedicineDetail";
 import PatientDashboard from "@/pages/patient/PatientDashboard";
 import SymptomChecker from "@/pages/patient/SymptomChecker";
 import PharmacistDashboard from "@/pages/pharmacist/PharmacistDashboard";
@@ -63,6 +64,7 @@ export default function AppRoutes() {
         <Route path="/patient/appointments" element={<AppointmentList />} />
         <Route path="/patient/orders" element={<OrderList />} />
         <Route path="/patient/medicines" element={<MedicineCatalog />} />
+        <Route path="/patient/medicines/:id" element={<MedicineDetail />} />
         <Route path="/patient/cart" element={<CartPage />} />
         <Route path="/patient/prescriptions" element={<PrescriptionList />} />
         <Route path="/patient/medical-records" element={<MedicalRecordsList />} />

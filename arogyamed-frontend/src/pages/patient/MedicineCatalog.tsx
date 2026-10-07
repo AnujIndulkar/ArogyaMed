@@ -1,29 +1,17 @@
 import { Badge } from "@/components/common/Badge";
 import { Card } from "@/components/common/Card";
+import { MedicineImage } from "@/components/common/MedicineImage";
 import { TableSkeleton } from "@/components/common/EmptyState";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useCart } from "@/hooks/useCart";
 import { medicineService } from "@/services/domainServices";
 import type { Medicine } from "@/types/common.types";
-import { getMediaUrl } from "@/utils/media";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Minus, Pill, Plus, Search, ShoppingCart } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-
-const categoryGradient = (category: string) => {
-  const palette = [
-    "from-primary-400 to-secondary-500",
-    "from-accent-400 to-accent-600",
-    "from-success-400 to-success-600",
-    "from-warning-400 to-warning-600",
-  ];
-  let hash = 0;
-  for (const ch of category) hash += ch.charCodeAt(0);
-  return palette[hash % palette.length];
-};
 
 function MedicineCard({ medicine }: { medicine: Medicine }) {
   const { items, addToCart, updateQuantity } = useCart();
@@ -32,16 +20,13 @@ function MedicineCard({ medicine }: { medicine: Medicine }) {
 
   return (
     <Card hover className="!p-0 overflow-hidden flex flex-col">
-      <div className={`h-32 relative ${medicine.imageUrl ? "" : `bg-gradient-to-br ${categoryGradient(medicine.category)}`} flex items-center justify-center`}>
-        {medicine.imageUrl ? (
-          <img
-            src={getMediaUrl(medicine.imageUrl) ?? ""}
-            alt={medicine.medicineName}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <Pill size={40} className="text-white/90" />
-        )}
+      <Link to={`/patient/medicines/${medicine.id}`} className="block h-36 relative">
+        <MedicineImage
+          name={medicine.medicineName}
+          packSize={medicine.packSize}
+          imageUrl={medicine.imageUrl}
+          className="w-full h-full"
+        />
         {medicine.stockQuantity < 20 && medicine.stockQuantity > 0 && (
           <span className="absolute top-2 right-2 bg-white/90 text-warning-600 text-[10px] font-semibold px-2 py-1 rounded-full">
             Only {medicine.stockQuantity} left
@@ -52,16 +37,20 @@ function MedicineCard({ medicine }: { medicine: Medicine }) {
             Out of stock
           </span>
         )}
-      </div>
+      </Link>
 
       <div className="p-4 flex flex-col flex-1">
         <span className="text-[11px] font-medium text-primary-600 uppercase tracking-wide">
           {medicine.category}
         </span>
-        <p className="font-display font-semibold text-ink-900 mt-1 truncate">
+        <Link
+          to={`/patient/medicines/${medicine.id}`}
+          className="font-display font-semibold text-ink-900 mt-1 truncate hover:text-primary-600"
+        >
           {medicine.medicineName}
-        </p>
-        <p className="text-xs text-ink-500 mt-0.5">Batch {medicine.batchNumber}</p>
+        </Link>
+        <p className="text-xs text-ink-500 mt-0.5 truncate">{medicine.packSize}</p>
+        <p className="text-[11px] text-ink-300 mt-0.5 truncate">{medicine.genericName}</p>
 
         <div className="flex items-center justify-between mt-3">
           <span className="font-display font-bold text-lg text-ink-900">₹{medicine.price}</span>
@@ -113,6 +102,7 @@ export default function MedicineCatalog() {
   const { totalItems } = useCart();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("ALL");
+  const [visible, setVisible] = useState(24);
 
   const categories = useMemo(() => {
     const set = new Set((medicines ?? []).map((m) => m.category));
@@ -125,6 +115,8 @@ export default function MedicineCatalog() {
     return matchesSearch && matchesCategory;
   });
 
+  const shown = filtered.slice(0, visible);
+
   return (
     <DashboardLayout title="Medicines">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
@@ -132,7 +124,7 @@ export default function MedicineCatalog() {
           <Search size={16} className="text-ink-300 shrink-0" />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setVisible(24); }}
             placeholder="Search medicine..."
             className="bg-transparent outline-none text-sm placeholder:text-ink-300 w-full"
           />
@@ -141,7 +133,7 @@ export default function MedicineCatalog() {
         <div className="flex items-center gap-3">
           <select
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => { setCategory(e.target.value); setVisible(24); }}
             className="text-sm border border-surface-border rounded-xl px-3 py-2.5 outline-none focus:border-primary-400 bg-white"
           >
             {categories.map((c) => (
@@ -173,18 +165,31 @@ export default function MedicineCatalog() {
           <p className="text-sm text-ink-500 mt-1">Try a different search or category</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map((m, i) => (
-            <motion.div
-              key={m.id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.03 }}
-            >
-              <MedicineCard medicine={m} />
-            </motion.div>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {shown.map((m, i) => (
+              <motion.div
+                key={m.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i, 12) * 0.03 }}
+              >
+                <MedicineCard medicine={m} />
+              </motion.div>
+            ))}
+          </div>
+
+          {filtered.length > shown.length && (
+            <div className="flex flex-col items-center gap-2 mt-6">
+              <p className="text-xs text-ink-500">
+                Showing {shown.length} of {filtered.length} medicines
+              </p>
+              <button onClick={() => setVisible((v) => v + 24)} className="btn-secondary text-sm !py-2.5">
+                Load more
+              </button>
+            </div>
+          )}
+        </>
       )}
     </DashboardLayout>
   );

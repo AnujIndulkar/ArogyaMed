@@ -22,6 +22,12 @@ public class MedicineRequestDTO {
 
     private String description;
 
+    private String genericName;
+
+    private String packSize;
+
+    private String imageUrl;
+
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be greater than zero")
     private Double price;

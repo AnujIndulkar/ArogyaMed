@@ -14,8 +14,10 @@ import { StatCard } from "@/components/common/StatCard";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { TableSkeleton } from "@/components/common/EmptyState";
-import { medicineService } from "@/services/domainServices";
 import { colors } from "@/theme/tokens";
+import { useAuth } from "@/hooks/useAuth";
+import axiosInstance from "@/api/axiosInstance";
+import type { Medicine } from "@/types/common.types";
 
 const productionTrend = [
   { month: "Feb", batches: 40 },
@@ -27,9 +29,17 @@ const productionTrend = [
 ];
 
 export default function CompanyDashboard() {
+  const { user } = useAuth();
+
   const { data: medicines, isLoading } = useQuery({
-    queryKey: ["company-medicines"],
-    queryFn: medicineService.getAll,
+    queryKey: ["company-medicines", user?.fullName],
+    queryFn: async () => {
+      const response = await axiosInstance.get<Medicine[]>("/medicines/search/company", {
+        params: { companyName: user?.fullName },
+      });
+      return response.data;
+    },
+    enabled: !!user?.fullName,
     retry: false,
   });
 
