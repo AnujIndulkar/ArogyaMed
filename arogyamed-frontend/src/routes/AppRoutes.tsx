@@ -16,13 +16,14 @@ import CartPage from "@/pages/patient/CartPage";
 import MedicineCatalog from "@/pages/patient/MedicineCatalog";
 import MedicineDetail from "@/pages/patient/MedicineDetail";
 import PatientDashboard from "@/pages/patient/PatientDashboard";
-import SymptomChecker from "@/pages/patient/SymptomChecker";
+import ArogyaAI from "@/pages/patient/ArogyaAI";
 import PharmacistDashboard from "@/pages/pharmacist/PharmacistDashboard";
 import WholesalerDashboard from "@/pages/wholesaler/WholesalerDashboard";
 
 import AppointmentList from "@/pages/shared/AppointmentList";
 import DocumentsPage from "@/pages/shared/DocumentsPage";
 import InventoryList from "@/pages/shared/InventoryList";
+
 import MedicalRecordsList from "@/pages/shared/MedicalRecordsList";
 import MedicineList from "@/pages/shared/MedicineList";
 import NotificationsList from "@/pages/shared/NotificationsList";
@@ -60,7 +61,7 @@ export default function AppRoutes() {
       {/* Patient — no verification gate */}
       <Route element={<ProtectedRoute allowedRoles={["PATIENT"]} />}>
         <Route path="/patient/dashboard" element={<PatientDashboard />} />
-        <Route path="/patient/symptom-checker" element={<SymptomChecker />} />
+        <Route path="/patient/symptom-checker" element={<ArogyaAI />} />
         <Route path="/patient/appointments" element={<AppointmentList />} />
         <Route path="/patient/orders" element={<OrderList />} />
         <Route path="/patient/medicines" element={<MedicineCatalog />} />

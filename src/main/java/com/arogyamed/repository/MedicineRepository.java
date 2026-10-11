@@ -28,4 +28,7 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
 
     // Search Low Stock Medicines
     List<Medicine> findByStockQuantityLessThanEqual(Integer stockQuantity);
+
+    // Used by the symptom checker: medicines containing an ingredient, only in-stock ones
+    List<Medicine> findByGenericNameContainingIgnoreCaseAndStockQuantityGreaterThan(String genericName, Integer stockQuantity);
 }

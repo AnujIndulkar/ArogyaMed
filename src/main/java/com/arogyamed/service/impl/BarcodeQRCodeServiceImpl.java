@@ -4,7 +4,7 @@ import com.arogyamed.dto.BarcodeDashboardDTO;
 import com.arogyamed.dto.BarcodeQRCodeRequestDTO;
 import com.arogyamed.dto.BarcodeQRCodeResponseDTO;
 import com.arogyamed.model.*;
-import com.arogyamed.model.BarcodeQRCode;
+        import com.arogyamed.model.BarcodeQRCode;
 import com.arogyamed.model.BarcodeType;
 import com.arogyamed.model.Medicine;
 import com.arogyamed.model.VerificationStatus;

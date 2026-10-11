@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -10,11 +11,15 @@ import {
   Star,
   IndianRupee,
   Calendar,
+  Pill,
+  ShoppingCart,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/common/Card";
 import { Button } from "@/components/common/Button";
 import { Badge } from "@/components/common/Badge";
+import { MedicineImage } from "@/components/common/MedicineImage";
+import { useCart } from "@/hooks/useCart";
 import { aiService, type SymptomCheckResponse, type UrgencyLevel } from "@/services/aiService";
 
 const urgencyStyles: Record<UrgencyLevel, { tone: "success" | "warning" | "accent"; label: string }> = {
@@ -24,11 +29,12 @@ const urgencyStyles: Record<UrgencyLevel, { tone: "success" | "warning" | "accen
   EMERGENCY: { tone: "accent", label: "Emergency — seek help now" },
 };
 
-export default function SymptomChecker() {
+export default function ArogyaAI() {
   const [symptoms, setSymptoms] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [result, setResult] = useState<SymptomCheckResponse | null>(null);
+  const { addToCart } = useCart();
 
   const mutation = useMutation({
     mutationFn: aiService.checkSymptoms,
@@ -36,7 +42,7 @@ export default function SymptomChecker() {
       setResult(data);
     },
     onError: () => {
-      toast.error("Couldn't analyze symptoms right now. Please try again.");
+      toast.error("Arogya AI couldn't analyze your symptoms right now. Please try again.");
     },
   });
 
@@ -56,7 +62,7 @@ export default function SymptomChecker() {
   };
 
   return (
-    <DashboardLayout title="AI Symptom Checker">
+    <DashboardLayout title="Arogya AI">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         {/* Input panel */}
         <Card className="lg:col-span-2 h-fit">
@@ -65,10 +71,11 @@ export default function SymptomChecker() {
           </div>
 
           <p className="font-display font-bold text-lg text-ink-900">
-            Describe how you're feeling
+            Hi, I'm Arogya AI
           </p>
           <p className="text-sm text-ink-500 mt-1 mb-5">
-            We'll suggest the right specialist and matching doctors on ArogyaMed.
+            Tell me how you're feeling. I'll suggest the right specialist, matching doctors and common
+            over-the-counter medicines.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -101,14 +108,14 @@ export default function SymptomChecker() {
             </div>
 
             <Button type="submit" isLoading={mutation.isPending} className="w-full">
-              Analyze symptoms
+              Ask Arogya AI
             </Button>
           </form>
 
           <div className="flex items-start gap-2 mt-5 text-xs text-ink-500 bg-surface rounded-xl p-3">
             <Info size={14} className="shrink-0 mt-0.5" />
             <span>
-              This tool gives a suggestion, not a diagnosis. Always consult a
+              Arogya AI gives suggestions, not a diagnosis. Always consult a
               doctor for medical advice.
             </span>
           </div>
@@ -132,7 +139,7 @@ export default function SymptomChecker() {
             {mutation.isPending && (
               <Card className="h-full flex flex-col items-center justify-center py-20">
                 <div className="w-10 h-10 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin mb-4" />
-                <p className="text-sm text-ink-500">Analyzing your symptoms...</p>
+                <p className="text-sm text-ink-500">Arogya AI is thinking...</p>
               </Card>
             )}
 
@@ -179,6 +186,86 @@ export default function SymptomChecker() {
                     </p>
                   )}
                 </Card>
+
+                {/* ---- medicines that may help ---- */}
+                {result.urgencyLevel === "EMERGENCY" ? (
+                  <Card className="border border-accent-100 bg-accent-50">
+                    <p className="font-display font-semibold text-accent-600 flex items-center gap-2">
+                      <AlertTriangle size={16} /> This may be an emergency
+                    </p>
+                    <p className="text-sm text-ink-700 mt-2">
+                      Do not take medicines on your own. Call your local emergency number or go to the nearest
+                      hospital right now.
+                    </p>
+                  </Card>
+                ) : (
+                  <Card>
+                    <p className="font-display font-semibold text-ink-900 flex items-center gap-2">
+                      <Pill size={16} className="text-primary-500" /> Medicines that may help
+                    </p>
+
+                    <div className="flex items-start gap-2 mt-3 text-xs text-warning-600 bg-warning-50 rounded-xl p-3">
+                      <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+                      <span>
+                        Please consult a doctor before taking any medicine. This is only a general suggestion, not a
+                        prescription, and it may not be 100% right for you.
+                      </span>
+                    </div>
+
+                    {(result.suggestedMedicines ?? []).length > 0 ? (
+                      <>
+                        {(result.medicineHints ?? []).map((h, i) => (
+                          <p key={i} className="text-xs text-ink-500 mt-3">
+                            {h}
+                          </p>
+                        ))}
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                          {(result.suggestedMedicines ?? []).map((m) => (
+                            <div key={m.id} className="border border-surface-border rounded-xl p-3 flex flex-col gap-2">
+                              <div className="flex items-center gap-3">
+                                <MedicineImage
+                                  name={m.medicineName}
+                                  packSize={m.packSize}
+                                  imageUrl={m.imageUrl}
+                                  className="w-14 h-14 rounded-lg overflow-hidden shrink-0 border border-surface-border"
+                                />
+                                <div className="min-w-0">
+                                  <Link
+                                    to={`/patient/medicines/${m.id}`}
+                                    className="text-sm font-medium text-ink-900 hover:text-primary-600 block truncate"
+                                  >
+                                    {m.medicineName}
+                                  </Link>
+                                  <p className="text-xs text-ink-500 truncate">{m.packSize}</p>
+                                  <p className="text-xs text-ink-300 truncate">{m.genericName}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-ink-900">₹{m.price}</span>
+                                <button
+                                  onClick={() => {
+                                    addToCart(m);
+                                    toast.success(`${m.medicineName} added to cart`);
+                                  }}
+                                  className="btn-secondary text-xs !py-1.5 !px-3 flex items-center gap-1.5"
+                                >
+                                  <ShoppingCart size={13} /> Add
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-ink-500 mt-3">
+                        We don't have an over-the-counter suggestion for these symptoms. Please consult a doctor.
+                      </p>
+                    )}
+
+                    {result.medicineNote && <p className="text-xs text-ink-300 mt-4">{result.medicineNote}</p>}
+                  </Card>
+                )}
 
                 <div>
                   <p className="font-display font-semibold text-ink-900 mb-3">

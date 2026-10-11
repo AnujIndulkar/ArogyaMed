@@ -26,6 +26,12 @@ public class SymptomCheckResponseDTO {
 
     private List<DoctorResponseDTO> recommendedDoctors;
 
+    private List<MedicineResponseDTO> suggestedMedicines;
+
+    private List<String> medicineHints;
+
+    private String medicineNote;
+
     // true if the real AI model produced this, false if the rule-based fallback was used
     private Boolean aiGenerated;
 

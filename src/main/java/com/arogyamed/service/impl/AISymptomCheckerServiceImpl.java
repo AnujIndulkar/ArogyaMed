@@ -1,12 +1,16 @@
 package com.arogyamed.service.impl;
 
 import com.arogyamed.dto.DoctorResponseDTO;
+import com.arogyamed.dto.MedicineResponseDTO;
 import com.arogyamed.dto.SymptomCheckRequestDTO;
 import com.arogyamed.dto.SymptomCheckResponseDTO;
 import com.arogyamed.model.Doctor;
+import com.arogyamed.model.Medicine;
 import com.arogyamed.model.UrgencyLevel;
 import com.arogyamed.repository.DoctorRepository;
+import com.arogyamed.repository.MedicineRepository;
 import com.arogyamed.service.AISymptomCheckerService;
+import com.arogyamed.util.SymptomMedicineRules;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,7 +35,15 @@ public class AISymptomCheckerServiceImpl implements AISymptomCheckerService {
                     "Please consult a qualified doctor for accurate diagnosis and treatment. " +
                     "If this is a medical emergency, contact emergency services immediately.";
 
+    private static final String MEDICINE_NOTE_BASE =
+            "These are general over-the-counter suggestions matched from our catalog, not a prescription. " +
+                    "Do not take any medicine without asking a doctor or pharmacist, especially if you have " +
+                    "other health conditions, take other medicines, or are allergic to anything. " +
+                    "Read the label for dosage. If symptoms last more than 2-3 days or get worse, see a doctor.";
+
     private final DoctorRepository doctorRepository;
+
+    private final MedicineRepository medicineRepository;
 
     private final RestTemplate restTemplate;
 
@@ -91,15 +104,93 @@ public class AISymptomCheckerServiceImpl implements AISymptomCheckerService {
             doctorDTOs.add(dto);
         }
 
+        // ---- medicine suggestions (only for mild cases) ----
+        List<MedicineResponseDTO> suggestedMedicines = new ArrayList<>();
+        List<String> medicineHints = new ArrayList<>();
+
+        boolean mildCase = result.urgencyLevel == UrgencyLevel.LOW
+                || result.urgencyLevel == UrgencyLevel.MEDIUM;
+
+        if (mildCase && SymptomMedicineRules.isSafeForSuggestions(requestDTO.getSymptoms(), requestDTO.getAge())) {
+
+            for (SymptomMedicineRules.Rule rule : SymptomMedicineRules.match(requestDTO.getSymptoms())) {
+
+                List<Medicine> found = medicineRepository
+                        .findByGenericNameContainingIgnoreCaseAndStockQuantityGreaterThan(rule.ingredient(), 0)
+                        .stream()
+                        .filter(m -> m.getGenericName() != null && !m.getGenericName().contains("+"))
+                        .sorted(Comparator.comparing(Medicine::getPrice, Comparator.nullsLast(Comparator.naturalOrder())))
+                        .limit(3)
+                        .toList();
+
+                if (!found.isEmpty()) {
+                    medicineHints.add(rule.purpose());
+                    for (Medicine m : found) {
+                        suggestedMedicines.add(toMedicineDTO(m));
+                    }
+                }
+            }
+        }
+
         return SymptomCheckResponseDTO.builder()
                 .inputSymptoms(requestDTO.getSymptoms())
                 .possibleConditions(result.possibleConditions)
                 .recommendedSpecialization(result.specialization)
                 .urgencyLevel(result.urgencyLevel)
                 .recommendedDoctors(doctorDTOs)
+                .suggestedMedicines(suggestedMedicines)
+                .medicineHints(medicineHints)
+                .medicineNote(buildMedicineNote(requestDTO.getGender(), requestDTO.getAge()))
                 .aiGenerated(result.aiGenerated)
                 .disclaimer(DISCLAIMER)
                 .build();
+    }
+
+    // ==========================================================
+    // MEDICINE SUGGESTION HELPERS
+    // ==========================================================
+
+    private String buildMedicineNote(String gender, Integer age) {
+
+        StringBuilder note = new StringBuilder(MEDICINE_NOTE_BASE);
+
+        // pregnancy / breastfeeding advice is not relevant for male users
+        if (gender == null || !gender.equalsIgnoreCase("MALE")) {
+            note.append(" If you are pregnant, could be pregnant or are breastfeeding, ")
+                    .append("check with a doctor before taking any medicine.");
+        }
+
+        if (age != null && age < 12) {
+            note.append(" Medicines for children should only be given on a doctor's advice.");
+        } else if (age != null && age >= 60) {
+            note.append(" Older adults should be extra careful and check with a doctor or pharmacist first.");
+        }
+
+        return note.toString();
+    }
+
+    private MedicineResponseDTO toMedicineDTO(Medicine m) {
+
+        MedicineResponseDTO dto = new MedicineResponseDTO();
+
+        dto.setId(m.getId());
+        if (m.getCompany() != null) {
+            dto.setCompanyId(m.getCompany().getId());
+            dto.setCompanyName(m.getCompany().getCompanyName());
+        }
+        dto.setMedicineName(m.getMedicineName());
+        dto.setCategory(m.getCategory());
+        dto.setGenericName(m.getGenericName());
+        dto.setPackSize(m.getPackSize());
+        dto.setDescription(m.getDescription());
+        dto.setPrice(m.getPrice());
+        dto.setBatchNumber(m.getBatchNumber());
+        dto.setManufacturingDate(m.getManufacturingDate());
+        dto.setExpiryDate(m.getExpiryDate());
+        dto.setStockQuantity(m.getStockQuantity());
+        dto.setImageUrl(m.getImageUrl());
+
+        return dto;
     }
 
     // ==========================================================

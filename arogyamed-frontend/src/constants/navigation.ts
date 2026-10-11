@@ -44,7 +44,7 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
     { label: "Medicines", path: "/patient/medicines", icon: Pill },
     { label: "Prescriptions", path: "/patient/prescriptions", icon: FileCheck },
     { label: "Medical Records", path: "/patient/medical-records", icon: FileText },
-    { label: "Symptom Checker", path: "/patient/symptom-checker", icon: Sparkles },
+    { label: "Arogya AI", path: "/patient/symptom-checker", icon: Sparkles },
     { label: "SOS & Ambulance", path: "/ambulance", icon: Siren },
     { label: "Reviews", path: "/patient/reviews", icon: Star },
     ...COMMON_ITEMS,

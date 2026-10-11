@@ -88,15 +88,14 @@ export default function PatientDashboard() {
             </div>
             <p className="font-display font-bold text-lg">Not feeling well?</p>
             <p className="text-sm text-white/70 mt-1.5">
-              Describe your symptoms and get an instant specialization
-              recommendation.
+              Ask Arogya AI for the right specialist, doctors and common medicines.
             </p>
           </div>
           <Link
-            to="/patient/symptom-checker"
+            to="/patient/arogya-ai"
             className="mt-6 bg-white text-primary-700 font-medium rounded-xl px-4 py-2.5 text-sm flex items-center justify-center gap-1.5 hover:-translate-y-0.5 transition-transform"
           >
-            Check symptoms <ArrowUpRight size={15} />
+             Ask Arogya AI <ArrowUpRight size={15} />
           </Link>
         </Card>
       </div>
