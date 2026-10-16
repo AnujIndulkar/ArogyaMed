@@ -67,6 +67,32 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/medicines/**").hasAnyRole("COMPANY", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/medicines/**").hasAnyRole("COMPANY", "ADMIN")
 
+                        // ---- orders ----
+                        // patients: place, pay, list their own, cancel their own
+                        .requestMatchers(HttpMethod.POST, "/api/orders/checkout", "/api/orders/*/pay", "/api/orders/*/cancel").hasRole("PATIENT")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/my").hasRole("PATIENT")
+                        // pharmacists: see unclaimed orders, accept one, see their own
+                        // (these must stay ABOVE the broad GET /api/orders/** rule below)
+                        .requestMatchers(HttpMethod.GET, "/api/orders/available", "/api/orders/assigned").hasRole("PHARMACIST")
+                        .requestMatchers(HttpMethod.POST, "/api/orders/*/accept").hasRole("PHARMACIST")
+                        // staff: change status, and the old raw endpoints
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/*/status").hasAnyRole("ADMIN", "PHARMACIST")
+                        .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyRole("ADMIN", "PHARMACIST")
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAnyRole("ADMIN", "PHARMACIST")
+                        // the full order list and search: staff only, so a patient cannot see other patients' orders
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").hasAnyRole("ADMIN", "PHARMACIST", "WHOLESALER", "DELIVERY_PARTNER")
+
+                        // ---- stock (pharmacist inventory page) ----
+                        .requestMatchers("/api/stock/**").hasAnyRole("PHARMACIST", "ADMIN")
+
+                        // ---- payments ----
+                        // the raw payment endpoints are for admins only: otherwise anyone could
+                        // mark their own payment as SUCCESS. Patients pay through /api/orders/{id}/pay.
+                        .requestMatchers(HttpMethod.POST, "/api/payments/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/payments/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/payments/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/payments/**").hasAnyRole("ADMIN", "PHARMACIST")
+
                         // everything else needs a valid login
                         .anyRequest().authenticated()
                 )

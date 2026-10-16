@@ -29,4 +29,8 @@ public class RegisterRequestDTO {
 
     @NotNull(message = "Role is required")
     private Role role;
+
+    // proof that this email was verified with an OTP (from POST /api/auth/otp/verify)
+    @NotBlank(message = "Please verify your email first")
+    private String emailVerificationToken;
 }

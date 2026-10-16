@@ -27,7 +27,6 @@ import InventoryList from "@/pages/shared/InventoryList";
 import MedicalRecordsList from "@/pages/shared/MedicalRecordsList";
 import MedicineList from "@/pages/shared/MedicineList";
 import NotificationsList from "@/pages/shared/NotificationsList";
-import OrderList from "@/pages/shared/OrderList";
 import PrescriptionList from "@/pages/shared/PrescriptionList";
 import ProfilePage from "@/pages/shared/ProfilePage";
 import ReviewsList from "@/pages/shared/ReviewsList";
@@ -35,6 +34,12 @@ import ReviewsList from "@/pages/shared/ReviewsList";
 import AuditLogTable from "@/pages/admin/AuditLogTable";
 import KYCTable from "@/pages/admin/KYCTable";
 import UsersTable from "@/pages/admin/UsersTable";
+
+import VerifyMedicine from "@/pages/public/VerifyMedicine";
+import BarcodePage from "@/pages/company/BarcodePage";
+import PatientOrders from "@/pages/patient/PatientOrders";
+import PharmacistStock from "@/pages/pharmacist/PharmacistStock";
+import PharmacistOrders from "@/pages/pharmacist/PharmacistOrders";
 
 const Placeholder = ({ label }: { label: string }) => (
   <div className="min-h-screen flex items-center justify-center bg-surface">
@@ -47,6 +52,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/verify/:id" element={<VerifyMedicine />} />
       <Route path="/register" element={<RoleSelect />} />
       <Route path="/register/:role" element={<RoleRegister />} />
 
@@ -63,7 +69,7 @@ export default function AppRoutes() {
         <Route path="/patient/dashboard" element={<PatientDashboard />} />
         <Route path="/patient/symptom-checker" element={<ArogyaAI />} />
         <Route path="/patient/appointments" element={<AppointmentList />} />
-        <Route path="/patient/orders" element={<OrderList />} />
+        <Route path="/patient/orders" element={<PatientOrders />} />
         <Route path="/patient/medicines" element={<MedicineCatalog />} />
         <Route path="/patient/medicines/:id" element={<MedicineDetail />} />
         <Route path="/patient/cart" element={<CartPage />} />
@@ -86,8 +92,8 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute allowedRoles={["PHARMACIST"]} />}>
         <Route element={<RequireVerification />}>
           <Route path="/pharmacist/dashboard" element={<PharmacistDashboard />} />
-          <Route path="/pharmacist/inventory" element={<InventoryList />} />
-          <Route path="/pharmacist/orders" element={<OrderList />} />
+          <Route path="/pharmacist/inventory" element={<PharmacistStock />} />
+          <Route path="/pharmacist/orders" element={<PharmacistOrders />} />
           <Route path="/pharmacist/prescriptions" element={<PrescriptionList />} />
         </Route>
       </Route>
@@ -106,7 +112,7 @@ export default function AppRoutes() {
         <Route element={<RequireVerification />}>
           <Route path="/company/dashboard" element={<CompanyDashboard />} />
           <Route path="/company/medicines" element={<MedicineList />} />
-          <Route path="/company/barcodes" element={<Placeholder label="Barcode / QR — coming next" />} />
+          <Route path="/company/barcodes" element={<BarcodePage />} />
         </Route>
       </Route>
 

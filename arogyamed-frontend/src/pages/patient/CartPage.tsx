@@ -1,40 +1,118 @@
+import axiosInstance from "@/api/axiosInstance";
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
 import { EmptyState } from "@/components/common/EmptyState";
+import { Modal } from "@/components/common/Modal";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useCart } from "@/hooks/useCart";
-import { orderService } from "@/services/domainServices";
-import type { Order } from "@/types/common.types";
-import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Banknote,
+  CreditCard,
+  Landmark,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Smartphone,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
+// What the backend sends back after checkout / payment
+interface CheckoutResponse {
+  orderId: number;
+  totalAmount: number;
+  orderStatus: string;
+  paymentStatus: "PENDING" | "SUCCESS" | "FAILED" | "REFUNDED";
+  paymentMethod: string;
+  transactionId: string;
+}
+
+const METHODS = [
+  { value: "CASH_ON_DELIVERY", label: "Cash on delivery", hint: "Pay when your order arrives", icon: Banknote },
+  { value: "UPI", label: "UPI", hint: "Google Pay, PhonePe, Paytm and more", icon: Smartphone },
+  { value: "CARD", label: "Credit / Debit card", hint: "Visa, Mastercard, RuPay", icon: CreditCard },
+  { value: "NET_BANKING", label: "Net banking", hint: "All major banks", icon: Landmark },
+] as const;
+
+type MethodValue = (typeof METHODS)[number]["value"];
+
+// The backend error looks like:  400 BAD_REQUEST "Azee 500 has only 3 in stock"
+// Show only the readable part inside the quotes.
+function errorMessage(err: unknown, fallback: string): string {
+  const raw = (err as { response?: { data?: { message?: unknown } } })?.response?.data?.message;
+  if (typeof raw !== "string") return fallback;
+  const quoted = raw.match(/"([^"]+)"/);
+  return quoted ? quoted[1] : raw;
+}
+
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, clearCart, totalAmount } = useCart();
   const navigate = useNavigate();
+
+  const [method, setMethod] = useState<MethodValue>("CASH_ON_DELIVERY");
   const [placing, setPlacing] = useState(false);
+  const [paying, setPaying] = useState(false);
+  // set after checkout for online payments: opens the demo payment window
+  const [pendingOrder, setPendingOrder] = useState<CheckoutResponse | null>(null);
 
-  const mutation = useMutation({
-    mutationFn: (payload: Partial<Order>) => orderService.create(payload),
-    onMutate: () => setPlacing(true),
-    onSuccess: () => {
-      toast.success("Order placed successfully!");
-      clearCart();
-      navigate("/patient/orders");
-    },
-    onError: () => {
-      toast.error("Couldn't place order. Please try again.");
+  const isOnline = method !== "CASH_ON_DELIVERY";
+  const methodLabel = METHODS.find((m) => m.value === pendingOrder?.paymentMethod)?.label ?? "Online payment";
+
+  const finishSuccess = (message: string) => {
+    toast.success(message);
+    clearCart();
+    navigate("/patient/orders");
+  };
+
+  // Step 1: create the order. Only ids and quantities are sent;
+  // the server works out prices and the total itself.
+  const handleCheckout = async () => {
+    setPlacing(true);
+    try {
+      const { data } = await axiosInstance.post<CheckoutResponse>("/orders/checkout", {
+        items: items.map((i) => ({ medicineId: i.medicineId, quantity: i.quantity })),
+        paymentMethod: method,
+      });
+
+      if (method === "CASH_ON_DELIVERY") {
+        finishSuccess("Order placed! You will pay cash on delivery.");
+      } else {
+        setPendingOrder(data); // open the demo payment window
+      }
+    } catch (err) {
+      toast.error(errorMessage(err, "Couldn't place order. Please try again."));
+    } finally {
       setPlacing(false);
-    },
-  });
+    }
+  };
 
-  const handleCheckout = () => {
-    mutation.mutate({
-      totalAmount,
-      status: "PENDING",
-    } as Partial<Order>);
+  // Step 2 (online only): the demo gateway
+  const handlePay = async (simulateFailure: boolean, cancelled = false) => {
+    if (!pendingOrder) return;
+    setPaying(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 900)); // looks like a real gateway working
+      const { data } = await axiosInstance.post<CheckoutResponse>(
+        `/orders/${pendingOrder.orderId}/pay`,
+        { simulateFailure }
+      );
+      setPendingOrder(null);
+
+      if (data.paymentStatus === "SUCCESS") {
+        finishSuccess("Payment successful! Your order is confirmed.");
+      } else if (cancelled) {
+        toast.info("Payment cancelled. Your cart is still here.");
+      } else {
+        toast.error("Payment failed. The order was cancelled, so you can try again.");
+      }
+    } catch (err) {
+      toast.error(errorMessage(err, "Payment could not be completed."));
+    } finally {
+      setPaying(false);
+    }
   };
 
   return (
@@ -114,12 +192,67 @@ export default function CartPage() {
               <span>₹{totalAmount}</span>
             </div>
 
+            {/* Payment method */}
+            <p className="font-display font-semibold text-ink-900 mt-6 mb-3">Payment method</p>
+            <div className="flex flex-col gap-2">
+              {METHODS.map((m) => {
+                const selected = method === m.value;
+                const Icon = m.icon;
+                return (
+                  <button
+                    key={m.value}
+                    type="button"
+                    onClick={() => setMethod(m.value)}
+                    className={`flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-left transition-colors ${
+                      selected
+                        ? "border-primary-400 bg-primary-50"
+                        : "border-surface-border bg-white hover:border-primary-200"
+                    }`}
+                  >
+                    <Icon size={18} className={selected ? "text-primary-600" : "text-ink-500"} />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-medium text-ink-900">{m.label}</span>
+                      <span className="block text-xs text-ink-500">{m.hint}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
             <Button onClick={handleCheckout} isLoading={placing} className="w-full mt-5">
-              Place order
+              {isOnline ? "Continue to payment" : "Place order"}
             </Button>
           </Card>
         </div>
       )}
+
+      {/* Demo payment window (online methods only) */}
+      <Modal open={!!pendingOrder} onClose={() => !paying && handlePay(true, true)} title="Complete payment">
+        <div className="flex flex-col gap-4">
+          <div className="rounded-xl bg-warning-50 px-3.5 py-2.5 text-xs font-medium text-warning-600">
+            Demo payment: no real money is charged.
+          </div>
+
+          <div className="text-center">
+            <p className="text-sm text-ink-500">{methodLabel}</p>
+            <p className="font-display font-bold text-3xl text-ink-900 mt-1">₹{pendingOrder?.totalAmount}</p>
+            <p className="text-xs text-ink-500 mt-1">Order #{pendingOrder?.orderId}</p>
+          </div>
+
+          <Button onClick={() => handlePay(false)} isLoading={paying} className="w-full">
+            Pay ₹{pendingOrder?.totalAmount}
+          </Button>
+
+          <button
+            type="button"
+            disabled={paying}
+            onClick={() => handlePay(true)}
+            className="text-sm text-ink-500 hover:text-accent-600 disabled:opacity-40"
+          >
+            Simulate a failed payment
+          </button>
+        </div>
+      </Modal>
     </DashboardLayout>
   );
 }

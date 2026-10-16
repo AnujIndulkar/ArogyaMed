@@ -20,6 +20,7 @@ export interface RegisterRequest {
   password: string;
   phoneNumber: string;
   role: Role;
+  emailVerificationToken: string;
 }
 
 export interface LoginResponse {
@@ -36,6 +37,17 @@ export interface RegisterResponse {
   fullName: string;
   email: string;
   message: string;
+}
+
+export interface OtpSendResponse {
+  message: string;
+  resendAfterSeconds: number;
+  expiresInSeconds: number;
+}
+
+export interface OtpVerifyResponse {
+  verificationToken: string;
+  expiresInSeconds: number;
 }
 
 export interface AuthUser {

@@ -106,9 +106,11 @@ public class OrderServiceImpl implements OrderService {
 
         dto.setPatientName(order.getPatient().getUser().getFullName());
 
-        dto.setPharmacistId(order.getPharmacist().getId());
-
-        dto.setPharmacistName(order.getPharmacist().getUser().getFullName());
+        // pharmacist is optional now (a patient order has none until it is fulfilled)
+        if (order.getPharmacist() != null) {
+            dto.setPharmacistId(order.getPharmacist().getId());
+            dto.setPharmacistName(order.getPharmacist().getUser().getFullName());
+        }
 
         dto.setTotalAmount(order.getTotalAmount());
 

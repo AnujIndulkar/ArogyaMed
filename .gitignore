@@ -37,3 +37,5 @@ src/main/resources/application-local.properties
 .env
 /indian_medicine_data.json
 /India Medicines and Drug Info Dataset.csv
+
+uploads/

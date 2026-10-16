@@ -4,12 +4,14 @@ import com.arogyamed.model.Pharmacist;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-
 import java.util.Optional;
 
 public interface PharmacistRepository extends JpaRepository<Pharmacist, Long> {
 
     Optional<Pharmacist> findByUserId(Long userId);
+
+    // Find the pharmacist who owns the login token (the token name is the email)
+    Optional<Pharmacist> findByUser_Email(String email);
 
     // ================= Search Methods =================
 
@@ -26,5 +28,4 @@ public interface PharmacistRepository extends JpaRepository<Pharmacist, Long> {
     List<Pharmacist> findByUser_EmailContainingIgnoreCase(String email);
 
     List<Pharmacist> findByUser_PhoneNumberContaining(String phoneNumber);
-    
 }

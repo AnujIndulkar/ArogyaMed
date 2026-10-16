@@ -4,15 +4,20 @@ import com.arogyamed.dto.LoginRequestDTO;
 import com.arogyamed.dto.LoginResponseDTO;
 import com.arogyamed.dto.RegisterRequestDTO;
 import com.arogyamed.dto.RegisterResponseDTO;
+import com.arogyamed.model.Role;
 import com.arogyamed.model.User;
 import com.arogyamed.repository.UserRepository;
 import com.arogyamed.security.JwtService;
 import com.arogyamed.service.AuthService;
+import com.arogyamed.service.EmailVerificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +31,25 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final EmailVerificationService emailVerificationService;
+
     @Override
+    @Transactional
     public RegisterResponseDTO register(RegisterRequestDTO request) {
+
+        // Nobody can make themselves an admin. Admin accounts are created by the
+        // database seeder or directly in the database, never through public sign-up.
+        if (request.getRole() == Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Admin accounts cannot be created through registration");
+        }
 
         if(userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
+
+        // The email must have been verified with an OTP. Throws 403 if not.
+        emailVerificationService.assertVerified(request.getEmail(), request.getEmailVerificationToken());
 
         User user = new User();
 
@@ -46,6 +64,9 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(request.getRole());
 
         User savedUser = userRepository.save(user);
+
+        // the proof is single-use: remove it now that the account exists
+        emailVerificationService.clear(request.getEmail());
 
         return new RegisterResponseDTO(savedUser.getId(), savedUser.getFullName(), savedUser.getEmail(), "Registration Successful");
 

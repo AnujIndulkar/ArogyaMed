@@ -12,6 +12,7 @@ import { Minus, Pill, Plus, Search, ShoppingCart } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import ScanMedicineButton from "@/components/common/ScanMedicineButton";
 
 function MedicineCard({ medicine }: { medicine: Medicine }) {
   const { items, addToCart, updateQuantity } = useCart();
@@ -131,6 +132,7 @@ export default function MedicineCatalog() {
         </div>
 
         <div className="flex items-center gap-3">
+          <ScanMedicineButton />
           <select
             value={category}
             onChange={(e) => { setCategory(e.target.value); setVisible(24); }}
