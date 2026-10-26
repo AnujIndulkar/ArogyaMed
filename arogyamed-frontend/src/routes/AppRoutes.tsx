@@ -9,6 +9,9 @@ import RoleSelect from "@/pages/auth/RoleSelect";
 
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AmbulanceSOS from "@/pages/ambulance/AmbulanceSOS";
+import ProviderBookings from "@/pages/ambulance/ProviderBookings";
+import ProviderDashboard from "@/pages/ambulance/ProviderDashboard";
+import ProviderRequests from "@/pages/ambulance/ProviderRequests";
 import CompanyDashboard from "@/pages/company/CompanyDashboard";
 import DeliveryDashboard from "@/pages/delivery/DeliveryDashboard";
 import DoctorDashboard from "@/pages/doctor/DoctorDashboard";
@@ -40,6 +43,10 @@ import BarcodePage from "@/pages/company/BarcodePage";
 import PatientOrders from "@/pages/patient/PatientOrders";
 import PharmacistStock from "@/pages/pharmacist/PharmacistStock";
 import PharmacistOrders from "@/pages/pharmacist/PharmacistOrders";
+
+import QualityBatches from "@/pages/quality/QualityBatches";
+import QualityDashboard from "@/pages/quality/QualityDashboard";
+import QualityInspections from "@/pages/quality/QualityInspections";
 
 const Placeholder = ({ label }: { label: string }) => (
   <div className="min-h-screen flex items-center justify-center bg-surface">
@@ -121,6 +128,24 @@ export default function AppRoutes() {
         <Route element={<RequireVerification />}>
           <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
           <Route path="/delivery/deliveries" element={<Placeholder label="Deliveries — coming next" />} />
+        </Route>
+      </Route>
+
+      {/* Quality Inspector — verification gated */}
+      <Route element={<ProtectedRoute allowedRoles={["QUALITY_INSPECTOR"]} />}>
+        <Route element={<RequireVerification />}>
+          <Route path="/quality-inspector/dashboard" element={<QualityDashboard />} />
+          <Route path="/quality-inspector/inspections" element={<QualityInspections />} />
+          <Route path="/quality-inspector/batches" element={<QualityBatches />} />
+        </Route>
+      </Route>
+
+      {/* Ambulance Provider — verification gated */}
+      <Route element={<ProtectedRoute allowedRoles={["AMBULANCE_PROVIDER"]} />}>
+        <Route element={<RequireVerification />}>
+          <Route path="/ambulance-provider/dashboard" element={<ProviderDashboard />} />
+          <Route path="/ambulance-provider/requests" element={<ProviderRequests />} />
+          <Route path="/ambulance-provider/bookings" element={<ProviderBookings />} />
         </Route>
       </Route>
 

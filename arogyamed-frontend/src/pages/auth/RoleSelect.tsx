@@ -3,8 +3,10 @@ import { motion } from "framer-motion";
 import {
     ArrowRight,
     Building2,
+    ClipboardCheck,
     HeartPulse,
     Pill,
+    Siren,
     Stethoscope,
     Truck,
     Warehouse,
@@ -12,6 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import logo from "@/assets/ArogyaMed_logo.png";
 
+// ADMIN is not listed on purpose: admin accounts are never created through sign-up.
 const ROLE_CARDS: { role: Role; icon: typeof HeartPulse; description: string }[] = [
   { role: "PATIENT", icon: HeartPulse, description: "Book doctors, order medicine, track your health" },
   { role: "DOCTOR", icon: Stethoscope, description: "Consult patients and manage appointments" },
@@ -19,7 +22,15 @@ const ROLE_CARDS: { role: Role; icon: typeof HeartPulse; description: string }[]
   { role: "WHOLESALER", icon: Warehouse, description: "Supply stock to pharmacies at scale" },
   { role: "COMPANY", icon: Building2, description: "Manufacture and distribute medicines" },
   { role: "DELIVERY_PARTNER", icon: Truck, description: "Deliver orders, earn on your schedule" },
+  { role: "QUALITY_INSPECTOR", icon: ClipboardCheck, description: "Inspect medicine batches and verify their quality" },
+  { role: "AMBULANCE_PROVIDER", icon: Siren, description: "Respond to emergency requests with your ambulance" },
 ];
+
+// "DELIVERY_PARTNER" -> "delivery-partner" (replaceAll: the old code only replaced the FIRST underscore)
+const toSlug = (role: Role) => role.toLowerCase().replaceAll("_", "-");
+
+const toLabel = (role: Role) =>
+  role.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 export default function RoleSelect() {
   return (
@@ -44,16 +55,14 @@ export default function RoleSelect() {
               transition={{ delay: i * 0.05 }}
             >
               <Link
-                to={`/register/${card.role.toLowerCase().replace("_", "-")}`}
+                to={`/register/${toSlug(card.role)}`}
                 className="card card-hover p-5 flex items-center gap-4 group"
               >
                 <div className="w-12 h-12 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
                   <card.icon size={22} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-display font-semibold text-ink-900">
-                    {card.role.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-                  </p>
+                  <p className="font-display font-semibold text-ink-900">{toLabel(card.role)}</p>
                   <p className="text-xs text-ink-500 mt-0.5">{card.description}</p>
                 </div>
                 <ArrowRight size={18} className="text-ink-300 group-hover:text-primary-600 transition-colors shrink-0" />

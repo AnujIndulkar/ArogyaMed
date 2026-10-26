@@ -22,6 +22,16 @@ public interface QualityCheckRepository extends JpaRepository<QualityCheck, Long
 
     long countByQualityStatus(QualityStatus qualityStatus);
 
+    // ================= Inspector dashboard =================
+
+    boolean existsByMedicine_IdAndBatchNumber(Long medicineId, String batchNumber);
+
+    List<QualityCheck> findByInspector_IdOrderByInspectionDateDescIdDesc(Long inspectorId);
+
+    long countByInspector_Id(Long inspectorId);
+
+    long countByInspector_IdAndQualityStatus(Long inspectorId, QualityStatus qualityStatus);
+
     // ================= Search =================
 
     List<QualityCheck> findByInspector(QualityInspector inspector);

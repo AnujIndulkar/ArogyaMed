@@ -10,6 +10,9 @@ public interface QualityInspectorRepository extends JpaRepository<QualityInspect
 
     Optional<QualityInspector> findByUserId(Long userId);
 
+    // the logged-in inspector, found by the email in their login token
+    Optional<QualityInspector> findByUser_Email(String email);
+
     // ================= Search Methods =================
 
     List<QualityInspector> findByUser_FullNameContainingIgnoreCase(String fullName);

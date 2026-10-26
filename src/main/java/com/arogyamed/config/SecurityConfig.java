@@ -61,6 +61,18 @@ public class SecurityConfig {
                         // admin-only areas
                         .requestMatchers("/api/admins/**", "/api/audit-logs/**").hasRole("ADMIN")
 
+                        // quality inspectors: only they (and admins for the raw records) can touch inspections
+                        .requestMatchers("/api/inspections/**").hasRole("QUALITY_INSPECTOR")
+                        .requestMatchers("/api/quality-checks/**").hasAnyRole("QUALITY_INSPECTOR", "ADMIN")
+
+                        // ambulance providers: their own dashboard API. The raw ambulance and booking
+                        // endpoints can change anyone's data, so they are admin-only.
+                        .requestMatchers("/api/ambulance-provider/**").hasRole("AMBULANCE_PROVIDER")
+                        .requestMatchers("/api/ambulance-bookings/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/ambulances/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/ambulances/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/ambulances/**").hasRole("ADMIN")
+
                         // only companies (and admins) may change medicines
                         .requestMatchers(HttpMethod.POST, "/api/medicines/**").hasAnyRole("COMPANY", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/medicines/**").hasAnyRole("COMPANY", "ADMIN")

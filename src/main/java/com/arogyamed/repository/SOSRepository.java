@@ -9,6 +9,9 @@ import java.util.List;
 
 public interface SOSRepository extends JpaRepository<SOS, Long> {
 
+    // a patient's own emergencies, newest first
+    List<SOS> findByPatient_IdOrderByCreatedAtDesc(Long patientId);
+
     // ================= Search =================
 
     // Search by Patient Name

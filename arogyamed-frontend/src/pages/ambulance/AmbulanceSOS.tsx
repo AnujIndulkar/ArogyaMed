@@ -2,18 +2,14 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import {
-  Ambulance,
-  PhoneCall,
-  Navigation,
-  Clock,
-  Siren,
-  MapPin,
-} from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Ambulance, PhoneCall, Clock, Siren, MapPin } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { Button } from "@/components/common/Button";
+import { useAuth } from "@/hooks/useAuth";
+import { apiMessage, label, patientSosService, when } from "@/services/ambulanceService";
 import { fixLeafletIcons, ambulanceIcon } from "@/utils/leafletIcons";
 
 fixLeafletIcons();
@@ -31,6 +27,10 @@ function offset([lat, lng]: [number, number], dLat: number, dLng: number): [numb
 }
 
 export default function AmbulanceSOS() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const isPatient = user?.role === "PATIENT";
+
   const [center, setCenter] = useState<[number, number]>(DEFAULT_CENTER);
   const [locating, setLocating] = useState(true);
 
@@ -52,6 +52,24 @@ export default function AmbulanceSOS() {
     );
   }, []);
 
+  // the patient's open emergency, refreshed so they see when an ambulance accepts
+  const { data: sos } = useQuery({
+    queryKey: ["my-sos"],
+    queryFn: patientSosService.active,
+    enabled: isPatient,
+    refetchInterval: 8000,
+    retry: false,
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: (id: number) => patientSosService.cancel(id),
+    onSuccess: () => {
+      toast.success("Emergency cancelled");
+      queryClient.invalidateQueries({ queryKey: ["my-sos"] });
+    },
+    onError: (err) => toast.error(apiMessage(err, "Could not cancel the request")),
+  });
+
   const nearbyAmbulances = [
     { id: "AMB-101", pos: offset(center, 0.008, 0.006), driver: "Suresh Patil", eta: "6 min", vehicle: "MH-12-AB-3345" },
     { id: "AMB-104", pos: offset(center, -0.005, 0.009), driver: "Ravi Kumar", eta: "9 min", vehicle: "MH-12-CD-7712" },
@@ -59,7 +77,7 @@ export default function AmbulanceSOS() {
   ];
 
   const handleBook = (id: string) => {
-    toast.success(`${id} is on the way — live tracking started`);
+    toast.info(`${id} is sample data. Hold the SOS button to send a real request.`);
   };
 
   return (
@@ -100,22 +118,85 @@ export default function AmbulanceSOS() {
 
         {/* Side panel */}
         <div className="flex flex-col gap-5">
-          <Card className="bg-gradient-accent text-white">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center">
-                <Siren size={20} />
+          {sos ? (
+            <Card className="border-accent-200">
+              <div className="flex items-center justify-between mb-3">
+                <p className="font-display font-semibold text-ink-900 flex items-center gap-2">
+                  <Siren size={17} className="text-accent-600" />
+                  Your emergency
+                </p>
+                <Badge tone={sos.status === "PENDING" ? "warning" : "success"}>{label(sos.status)}</Badge>
               </div>
-              <div>
-                <p className="font-display font-bold">Emergency?</p>
-                <p className="text-xs text-white/80">Use the SOS button, bottom-right</p>
+
+              {sos.status === "PENDING" ? (
+                <>
+                  <p className="text-sm text-ink-700">
+                    Request sent. Waiting for an ambulance to accept. This page updates by itself.
+                  </p>
+                  <p className="text-xs text-ink-500 mt-2">Sent {when(sos.createdAt)}</p>
+                  <p className="text-xs text-ink-500">Location: {sos.location || "not shared"}</p>
+
+                  <div className="flex gap-2 mt-4">
+                    <a
+                      href="tel:108"
+                      className="flex-1 text-center border border-surface-border rounded-xl px-3 py-2 text-sm font-medium text-ink-700 hover:bg-surface"
+                    >
+                      Call 108
+                    </a>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      isLoading={cancelMutation.isPending}
+                      onClick={() => cancelMutation.mutate(sos.sosId)}
+                    >
+                      Cancel request
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-ink-900">
+                    {sos.status === "IN_PROGRESS" ? "Your ambulance is on the way" : "An ambulance accepted your request"}
+                  </p>
+
+                  <div className="mt-3 text-sm text-ink-700 flex flex-col gap-1">
+                    <p>Vehicle: <span className="font-mono">{sos.ambulanceNumber || "-"}</span></p>
+                    <p>Driver: {sos.driverName || "-"}</p>
+                    {sos.etaMinutes ? (
+                      <p className="flex items-center gap-1"><Clock size={13} /> About {sos.etaMinutes} min away</p>
+                    ) : null}
+                  </div>
+
+                  {sos.driverPhone && (
+                    <a
+                      href={`tel:${sos.driverPhone}`}
+                      className="mt-4 w-full text-center bg-gradient-primary text-white rounded-xl px-3 py-2 text-sm font-medium flex items-center justify-center gap-2"
+                    >
+                      <PhoneCall size={15} /> Call driver ({sos.driverPhone})
+                    </a>
+                  )}
+                </>
+              )}
+            </Card>
+          ) : (
+            <Card className="bg-gradient-accent text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center">
+                  <Siren size={20} />
+                </div>
+                <div>
+                  <p className="font-display font-bold">Emergency?</p>
+                  <p className="text-xs text-white/80">Hold the SOS button, bottom-right, for 3 seconds</p>
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          )}
 
           <Card>
             <p className="font-display font-semibold text-ink-900 mb-4 flex items-center gap-2">
               <Ambulance size={17} className="text-primary-600" />
               Nearby ambulances
+              <Badge tone="neutral">Sample</Badge>
             </p>
 
             <div className="flex flex-col gap-3">
@@ -137,8 +218,8 @@ export default function AmbulanceSOS() {
                     <span className="flex items-center gap-1 text-xs text-ink-500">
                       <Clock size={12} /> ETA {amb.eta}
                     </span>
-                    <Button size="sm" onClick={() => handleBook(amb.id)}>
-                      Book now
+                    <Button size="sm" variant="secondary" onClick={() => handleBook(amb.id)}>
+                      Details
                     </Button>
                   </div>
                 </motion.div>
@@ -168,7 +249,7 @@ export default function AmbulanceSOS() {
 
           <div className="flex items-center gap-1.5 text-xs text-ink-500 px-1">
             <MapPin size={12} />
-            <span>Location updates automatically shared during active bookings</span>
+            <span>Your location is shared only when you send an SOS</span>
           </div>
         </div>
       </div>

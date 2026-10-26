@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.mvn/wrapper/maven-wrapper.jar
+target
+uploads
+arogyamed-frontend
+tools
+*.iml
+*.md
+.env
+application-local.properties

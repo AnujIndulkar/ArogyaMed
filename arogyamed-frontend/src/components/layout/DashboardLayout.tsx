@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
+import { FloatingSOSButton } from "./FloatingSOSButton";
+import { useAuth } from "@/hooks/useAuth";
 
 export function DashboardLayout({
   title,
@@ -10,6 +12,8 @@ export function DashboardLayout({
   title: string;
   children: ReactNode;
 }) {
+  const { user } = useAuth();
+
   return (
     <div className="flex min-h-screen bg-surface">
       <Sidebar />
@@ -26,6 +30,9 @@ export function DashboardLayout({
           {children}
         </motion.main>
       </div>
+
+      {/* emergency button: patients only, on every dashboard page */}
+      {user?.role === "PATIENT" && <FloatingSOSButton />}
     </div>
   );
 }

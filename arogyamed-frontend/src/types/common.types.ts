@@ -139,6 +139,8 @@ export interface Medicine {
   companyName?: string;
   medicineName: string;
   category: string;
+  genericName?: string;
+  packSize?: string;
   description?: string;
   price: number;
   stockQuantity: number;
