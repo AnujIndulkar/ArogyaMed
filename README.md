@@ -10,6 +10,7 @@
 ![Maven](https://img.shields.io/badge/Maven-Build-red?style=for-the-badge&logo=apachemaven)
 ![REST API](https://img.shields.io/badge/API-REST-informational?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![CI](https://github.com/AnujIndulkar/ArogyaMed/actions/workflows/ci.yml/badge.svg)
 
 </p>
 
