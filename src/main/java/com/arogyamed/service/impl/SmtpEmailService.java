@@ -67,7 +67,7 @@ public class SmtpEmailService implements EmailService {
                     + "}";
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://brevo.com"))
+                    .uri(URI.create("https://" + "api.brevo.com" + "/v3/smtp/email"))
                     .timeout(Duration.ofSeconds(10))
                     .header("accept", "application/json")
                     .header("api-key", brevoApiKey.trim())
