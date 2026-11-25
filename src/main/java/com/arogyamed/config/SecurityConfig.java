@@ -43,6 +43,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/health").permitAll()
+                        .requestMatchers(HttpMethod.HEAD, "/health").permitAll()
 
                         // login + register
                         .requestMatchers("/api/auth/**").permitAll()

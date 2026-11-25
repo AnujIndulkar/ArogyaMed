@@ -4,12 +4,11 @@ import com.arogyamed.service.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -38,6 +37,7 @@ public class SmtpEmailService implements EmailService {
         this.brevoApiKey = brevoApiKey;
     }
 
+    @Async
     @Override
     public void sendOtp(String to, String code, int validMinutes) {
         String subject = "Your ArogyaMed verification code";
@@ -78,16 +78,12 @@ public class SmtpEmailService implements EmailService {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                log.error("Brevo API failed ({}): {}", response.statusCode(), response.body());
-                throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                        "We couldn't send the email. Please try again in a moment");
+                log.error("Brevo API failed ({}) for {}: {}", response.statusCode(), to, response.body());
+            } else {
+                log.info("OTP email sent asynchronously via Brevo API to {}", to);
             }
-        } catch (ResponseStatusException e) {
-            throw e;
         } catch (Exception e) {
-            log.error("Could not send OTP email via Brevo API", e);
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "We couldn't send the email. Please try again in a moment");
+            log.error("Could not send OTP email via Brevo API to {}", to, e);
         }
     }
 
@@ -100,10 +96,9 @@ public class SmtpEmailService implements EmailService {
 
         try {
             mailSender.send(message);
+            log.info("OTP email sent asynchronously via SMTP to {}", to);
         } catch (MailException e) {
-            log.error("Could not send OTP email", e);
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
-                    "We couldn't send the email. Please try again in a moment");
+            log.error("Could not send OTP email via SMTP to {}", to, e);
         }
     }
 }
